@@ -1,0 +1,26 @@
+{
+  "name": "cat-api",
+  "version": "1.0.0",
+  "description": "API to process HTTP requests to access information on local cats",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skwong25/cat-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skwong25/cat-api/issues"
+  },
+  "homepage": "https://github.com/skwong25/cat-api#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.6.0"
+  }
+}
