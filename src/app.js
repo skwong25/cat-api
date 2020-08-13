@@ -20,11 +20,11 @@ const verifyId = (req, res, next) => {
     };
 }
 
-const checkObject = (req, res, next ) => {
+const checkObject = (req, res, next) => {
     if (req.query) {
         next()
     } else {
-        res.status(404).send('invalid information provided')
+        res.status(400).send('invalid information provided')
     }
 }
 
@@ -37,17 +37,17 @@ const PORT = 4001;
 app.use(morgan('tiny'));
 
 // GET request all 
-app.get('/cats', ( req, res, next ) => {
+app.get('/cats', (req, res, next) => {
     res.send(cats)
 });
 
 // GET request by id 
-app.get('/cats/:id', verifyId, ( req, res, next ) => {
+app.get('/cats/:id', verifyId, (req, res, next) => {
     res.send(cats[req.catIndex]);
 });
 
 // POST request  
-app.post('/cats', checkObject, ( req, res, next ) => {
+app.post('/cats', checkObject, (req, res, next) => {
     const catNew = req.query;
     catNew.id = nextId++;              // returns value of nextId, then increments by 1
     cats.push(catNew);
@@ -56,7 +56,7 @@ app.post('/cats', checkObject, ( req, res, next ) => {
 });
 
 // PUT request - allows user to add/update information by id
-app.put('/cats/:id', verifyId, checkObject, ( req, res, next ) => {
+app.put('/cats/:id', verifyId, checkObject, (req, res, next) => {
     const catUpdates = req.query;                  // catUpdates to be an object 
     for (let key in catUpdates) {                  // loops to ensure each key-value pair is added 
         let index = req.catIndex
