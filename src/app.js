@@ -6,6 +6,7 @@ const morgan = require('morgan');
 
 const CatRepository = require('./catsDb.js'); // class instance / object  
 const breeds = require('./breedsDb.js');
+const { deleteCatByIndex } = require('./catsDb.js');
 
 const verifyId = (req, res, next) => {
     console.log('id being verified');
@@ -31,7 +32,7 @@ const checkObject = (req, res, next) => { // check all keys are valid
     arrayOfKeys = Object.keys(objToCheck);  // [ "name", "sex", "coat"]
     arrayOfKeys.forEach((key) => { 
         console.log(`checking key: ${key}`)
-        const index = possibleKeys.indexOf(key);
+        const index = possibleKeys.indexOf(key);    // alternative is to use .findByIndex(callback)
         if (index < 0) {
             const newError = new Error(`Key parameter '${key}' is NOT valid`)
             newError.status = 404; 
@@ -51,19 +52,18 @@ const checkObject = (req, res, next) => { // check all keys are valid
 
 let nextId = 5;
 
-// set up a port
-// app.use('/path', callback) to mount middleware functions (default called on request received) 
+// use app.use('/path', callback) to mount middleware functions (default called on request received) 
 const PORT = 4001;
 
 app.use(morgan('tiny'));
 
-// GET request all 
+// GET route all 
 app.get('/cats', (req, res, next) => {
     const cats = CatRepository.getAllCats;
     res.send({"cats": cats}); 
 });
 
-// GET request by id 
+// GET route by id 
 app.get('/cats/:id', verifyId, (req, res, next) => {
     index = req.catIndex
     const cat = CatRepository.getCatByIndex(index); // {}
@@ -72,42 +72,44 @@ app.get('/cats/:id', verifyId, (req, res, next) => {
 });
 
 
-// POST request  
+// POST route 
 app.post('/cats', checkObject, (req, res, next) => {
     const catNew = req.object;
     catNew.id = nextId++;                   // returns value of nextId, then increments by 1
     CatRepository.addCat = catNew;
     const newlyAdded = CatRepository.getAllCats.slice(-1);
-    res.send(newlyAdded);  
+    res.status(201).send(newlyAdded);  
 });
 
-/* 
-// PUT request - allows user to add/update information by id
+
+// PUT route - allows user to add/update information by id
 app.put('/cats/:id', verifyId, checkObject, (req, res, next) => {
-    const catUpdates = req.object;                  // catUpdates to be an object 
-    for (let key in catUpdates) {                  // loops to ensure each key-value pair is added 
-        let index = req.catIndex;
-        cats[index][key] = catUpdates[key]; 
-        console.log(cats[index]);
-        if (cats[index].hasOwnProperty(key)){      // check and reports back what has been updated 
-            console.log(`updated: ${key}: ${cats[index][key]}`);    
+    const index = req.catIndex;
+    const catUpdates = req.object;                            // {}
+    let catsToUpdate = CatRepository.getAllCats;             // [ {}, {}, {} ]
+
+    for (let key in catUpdates) {                           // loops to ensure each key-value pair is added 
+        catsToUpdate[index][key] = catUpdates[key]; 
+        if (catsToUpdate[index].hasOwnProperty(key)) {      // check and reports back what has been updated 
+            console.log(`cat id: ${catsToUpdate[index].id} updated ${key}: ${catsToUpdate[index][key]}`);    
+        } else {
+            const newError = new Error(`Key '${key}' has not been updated`);
+            newError.status = 500; 
+            next(newError); 
         }
     }
-    res.send(JSON.stringify(cats[req.catIndex]))    // converts JSON obj into JSON string
+
+    CatRepository.updateCats = catsToUpdate;         // object setter  
+    const updatedCat = CatRepository.getCatByIndex(index); 
+    res.send(JSON.stringify(updatedCat));           // converts JSON obj into JSON string
 });
 
 
-// DEL request 
+// DEL route
 app.delete('/cats/:id', verifyId, (req, res, next) => {
-    console.log(`Index to be deleted: ${req.catIndex}`);
-
-    const success = atRepository.deleteByIndex(req.catIndex)
-    // send an appropriate response
-
-    cats.splice([req.catIndex], 1);
+    CatRepository.deleteCatByIndex(req.catIndex); 
     res.status(204).send('deletion successful');
 });
-*/
 
 // error-handling to send back error responses 
 app.use((err, req, res, next) => {

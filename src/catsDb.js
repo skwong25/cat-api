@@ -1,6 +1,8 @@
 
 // class 'CatRepository' serves as a template for creating new cat objects with props & methods
 
+const { splice } = require("./breedsDb");
+
 class CatRepository {
     constructor() {
         this.cats = [ // array of objects - if object, change to >> this.cats:{ 1:{}, 2:{}, 3:{}}
@@ -42,31 +44,27 @@ class CatRepository {
         return this.cats // returns [{},{},{}]
         }
 
-    getCatByIndex (index) {
-        console.log(`retrieving cat at id: ${index}`);
-        return this.cats[index]; // returns {} (note that this.cats.index did not work)
-        }
-
     set addCat (object) {
         let arrayToUpdate = this.getAllCats;
         arrayToUpdate.push(object); 
         this.cats = arrayToUpdate; 
     }
 
-    // read setters, but what we really want to do is...[this.cats].push(object)
-    // a setter reassigns the value of a property
-    // either what we can do is to take a copy of that array, push in the object, and reassign
+    set updateCats(updatedArray) { 
+        this.cats = updatedArray; 
+    }
 
-    set updateCat(catUpdates) { // expect catUpdates to be an Object eg: { sex: "M", coat: "shorthair"}
+    getCatByIndex (index) {
+        console.log(`retrieving cat at id: ${index}`);
+        return this.cats[index];    // returns {} 
+        }
 
-    } 
+    deleteCatByIndex (index) {
+        let catsCopy = this.getAllCats;
+        catsCopy.splice(index, 1);
+        this.updateCats = catsCopy; 
+    }
 }
-    // can setters help us with deleteCatById(), post and put? 
-    // setters can help us reassign values to existing properties
-
-    // for DEL & POST requests that want to permanently change the database,  
-    // they need to affect the class - not the class instance, not sure how this works? 
-    // can it affect the file itself? 
 
 module.exports = new CatRepository();
 
