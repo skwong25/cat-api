@@ -1,32 +1,53 @@
 // CAT API
 
-const cats = require('./catsDb.js');
-const breeds = require('./breedsDb.js');
-
 const express = require('express');         // imports express lib module
 const app = express();                     // express() instantiates app 
 const morgan = require('morgan');
 
+const CatRepository = require('./catsDb.js'); // class instance / object  
+const breeds = require('./breedsDb.js');
+
 const verifyId = (req, res, next) => {
-    const catInQuestion = req.params.id;
-    const catIndex = cats.findIndex(cat => {     // findIndex() iterator 
-        return cat.id == catInQuestion;         // interchangeable with cat['id']
+    console.log('id being verified');
+    const catArray = CatRepository.getAllCats;          // catArray = [ {} , {}, {} ]
+    const id = req.params.id;                          // id to be verified
+    const catIndex = catArray.findIndex(cat => {      // findIndex() iterator 
+        return cat.id == id;                         // interchangeable with cat['id']
     }); 
-    if (catIndex !== -1) {
-        req.catIndex = catIndex;
-        next()
+    if (catIndex < 0) {
+        const newError =  new Error(`cat id '${id}' not found in database`)
+        newError.status = 404;
+        next(newError); 
     } else {
-        res.status(404).send('cat does not exist in this database');
+        console.log('id verified');
+        req.catIndex = catIndex;
+        next() 
     };
 }
 
-const checkObject = (req, res, next) => {
-    if (req.query) {
-        next()
-    } else {
-        res.status(400).send('invalid information provided')
-    }
+const checkObject = (req, res, next) => { // check all keys are valid 
+    const possibleKeys = ["name", "sex", "coat", "description", "breedId"]; 
+    const objToCheck = req.query; 
+    arrayOfKeys = Object.keys(objToCheck);  // [ "name", "sex", "coat"]
+    arrayOfKeys.forEach((key) => { 
+        console.log(`checking key: ${key}`)
+        const index = possibleKeys.indexOf(key);
+        if (index < 0) {
+            const newError = new Error(`Key parameter '${key}' is NOT valid`)
+            newError.status = 404; 
+            next(newError); 
+        } else {
+        console.log(`key '${key}' verified`)
+        }
+    });
+    console.log('object successfully checked');
+    req.object = objToCheck; 
+    next();
 }
+
+// Add middleware function to rearrange object properties to go in a certain order??
+// Add to checkObject to check type of object properties:
+// Eg sex to be M or F or NB, name to be string with first letter caps
 
 let nextId = 5;
 
@@ -38,29 +59,34 @@ app.use(morgan('tiny'));
 
 // GET request all 
 app.get('/cats', (req, res, next) => {
-    res.send(cats)
+    const cats = CatRepository.getAllCats;
+    res.send({"cats": cats}); 
 });
 
 // GET request by id 
 app.get('/cats/:id', verifyId, (req, res, next) => {
-    res.send(cats[req.catIndex]);
+    index = req.catIndex
+    const cat = CatRepository.getCatByIndex(index); // {}
+    console.log('cat retrieved:' + cat);
+    res.send(cat);
 });
+
 
 // POST request  
 app.post('/cats', checkObject, (req, res, next) => {
-    const catNew = req.query;
-    catNew.id = nextId++;              // returns value of nextId, then increments by 1
-    cats.push(catNew);
-    const lastAdded = cats.slice(-1); // extracts last element to check object added to the array
-    res.send(lastAdded);  
+    const catNew = req.object;
+    catNew.id = nextId++;                   // returns value of nextId, then increments by 1
+    CatRepository.addCat = catNew;
+    const newlyAdded = CatRepository.getAllCats.slice(-1);
+    res.send(newlyAdded);  
 });
 
+/* 
 // PUT request - allows user to add/update information by id
 app.put('/cats/:id', verifyId, checkObject, (req, res, next) => {
-    const catUpdates = req.query;                  // catUpdates to be an object 
+    const catUpdates = req.object;                  // catUpdates to be an object 
     for (let key in catUpdates) {                  // loops to ensure each key-value pair is added 
-        let index = req.catIndex
-        console.log(`Index: ${index} , Key: ${key} `);
+        let index = req.catIndex;
         cats[index][key] = catUpdates[key]; 
         console.log(cats[index]);
         if (cats[index].hasOwnProperty(key)){      // check and reports back what has been updated 
@@ -70,17 +96,32 @@ app.put('/cats/:id', verifyId, checkObject, (req, res, next) => {
     res.send(JSON.stringify(cats[req.catIndex]))    // converts JSON obj into JSON string
 });
 
+
 // DEL request 
 app.delete('/cats/:id', verifyId, (req, res, next) => {
     console.log(`Index to be deleted: ${req.catIndex}`);
+
+    const success = atRepository.deleteByIndex(req.catIndex)
+    // send an appropriate response
+
     cats.splice([req.catIndex], 1);
     res.status(204).send('deletion successful');
+});
+*/
+
+// error-handling to send back error responses 
+app.use((err, req, res, next) => {
+    let status = err.state || 500  
+    let message = err.message; 
+    res.status(status).send(message); 
 });
 
 // set the server up (listening for reqs)
 app.listen(PORT, () => { 
     console.log(`the server is listening for catcalls on port ${PORT}`)
 });
+
+
 
 
 // ------- RECAP: -------
