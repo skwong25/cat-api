@@ -8,35 +8,53 @@ const CatRepository = require('./catsDb.js'); // class instance / object
 const breeds = require('./breedsDb.js');
 const { deleteCatByIndex } = require('./catsDb.js');
 
-const verifyId = (req, res, next) => {
+
+// simple JS function 
+const isInvalidString = (value) => {
+    if (typeof value === "string") {
+        return false;
+    } else if (typeof value === "undefined") {
+        return false;                     
+    };                                   
+}
+// if value is undefined, then we can let it be ""; 
+
+// simple JS function 
+const generateErr = (value) => {
+    let message =  `Property value "${value}" is not a valid string`;
+    const newError = new Error(message);
+    newError.status = 404;
+    return newError; 
+}
+
+// checks id type 
+const isIdNum = (req, res, next) => {
     console.log('id being verified');
-    const catArray = CatRepository.getAllCats;          // catArray = [ {} , {}, {} ]
-    const id = req.params.id;                          // id to be verified
-    const catIndex = catArray.findIndex(cat => {      // findIndex() iterator 
-        return cat.id == id;                         // interchangeable with cat['id']
-    }); 
-    if (catIndex < 0) {
-        const newError =  new Error(`cat id '${id}' not found in database`)
+    const id = Number(req.params.id);                   // extracts id as a number - returns NaN if it can't 
+    if (id) {   
+        req.id = id;                                       // Alt: if (typeOf(id) === "number") { ... }        
+        console.log('id verified');
+        next() 
+    } else {
+        const newError =  new Error(`cat id '${id}' is not a valid number`)
         newError.status = 404;
         next(newError); 
-    } else {
-        console.log('id verified');
-        req.catIndex = catIndex;
-        next() 
     };
 }
 
-const checkObject = (req, res, next) => { // check all keys are valid 
+// checks object keys are valid 
+const checkObjKeys = (req, res, next) => { 
     const possibleKeys = ["name", "sex", "coat", "description", "breedId"]; 
-    const objToCheck = req.query; 
-    arrayOfKeys = Object.keys(objToCheck);  // [ "name", "sex", "coat"]
+    const objToCheck = req.query;                // { name: "", sex: "", coat: ""}
+    arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
     arrayOfKeys.forEach((key) => { 
         console.log(`checking key: ${key}`)
         const index = possibleKeys.indexOf(key);    // alternative is to use .findByIndex(callback)
         if (index < 0) {
-            const newError = new Error(`Key parameter '${key}' is NOT valid`)
-            newError.status = 404; 
-            next(newError); 
+            let message =  `"${key}" is not a valid property`;
+            const newError = new Error(message);
+            newError.status = 404;
+            return next(newError); 
         } else {
         console.log(`key '${key}' verified`)
         }
@@ -46,11 +64,33 @@ const checkObject = (req, res, next) => { // check all keys are valid
     next();
 }
 
-// Add middleware function to rearrange object properties to go in a certain order??
-// Add to checkObject to check type of object properties:
-// Eg sex to be M or F or NB, name to be string with first letter caps
+// checks the object values are valid 
+const checkObjValues = (req, res, next) => { 
+    const objToCheck = req.query;      // { name: "", sex: "", coat: ""}
 
-let nextId = 5;
+    if (isInvalidString(objToCheck.name)) {     
+        return next(generateErr(objToCheck.name));
+    }
+
+    if (isInvalidString(objToCheck.sex)) {
+        return next(generateErr(objToCheck.sex));
+    }
+
+    if (isInvalidString(objToCheck.coat)) {
+        return next(generateErr(objToCheck.coat));
+    }
+
+    if (isInvalidString(objToCheck.description)) {
+        return next(generateErr(objToCheck.description));
+    }
+
+    if (isInvalidString(objToCheck.breed)) {
+        return next(generateErr(objToCheck.breed));
+    }
+    req.object = objToCheck;            
+    console.log('object values checked');     
+    next();
+}
 
 // use app.use('/path', callback) to mount middleware functions (default called on request received) 
 const PORT = 4001;
@@ -59,56 +99,55 @@ app.use(morgan('tiny'));
 
 // GET route all 
 app.get('/cats', (req, res, next) => {
-    const cats = CatRepository.getAllCats;
+    const cats = CatRepository.getAllCats; // what if cats don't come back - generate error? 
     res.send({"cats": cats}); 
 });
 
 // GET route by id 
-app.get('/cats/:id', verifyId, (req, res, next) => {
-    index = req.catIndex
-    const cat = CatRepository.getCatByIndex(index); // {}
-    console.log('cat retrieved:' + cat);
-    res.send(cat);
+app.get('/cats/:id', isIdNum, (req, res, next) => {
+    const foundCat = CatRepository.getCatById(req.id); 
+    if (foundCat) {
+        console.log('cat retrieved:' + foundCat);
+        res.send(foundCat);
+    } else {
+        const newError =  new Error(`cat id '${req.id}' not found in database`)
+        newError.status = 400;
+        return next(newError)
+    };
 });
 
 
 // POST route 
-app.post('/cats', checkObject, (req, res, next) => {
-    const catNew = req.object;
-    catNew.id = nextId++;                   // returns value of nextId, then increments by 1
-    CatRepository.addCat = catNew;
-    const newlyAdded = CatRepository.getAllCats.slice(-1);
-    res.status(201).send(newlyAdded);  
+app.post('/cats', checkObjKeys, checkObjValues, (req, res, next) => {
+    CatRepository.addCat(req.object);
+    res.status(201).send("cat successfully added");  
 });
 
 
 // PUT route - allows user to add/update information by id
-app.put('/cats/:id', verifyId, checkObject, (req, res, next) => {
-    const index = req.catIndex;
-    const catUpdates = req.object;                            // {}
-    let catsToUpdate = CatRepository.getAllCats;             // [ {}, {}, {} ]
-
-    for (let key in catUpdates) {                           // loops to ensure each key-value pair is added 
-        catsToUpdate[index][key] = catUpdates[key]; 
-        if (catsToUpdate[index].hasOwnProperty(key)) {      // check and reports back what has been updated 
-            console.log(`cat id: ${catsToUpdate[index].id} updated ${key}: ${catsToUpdate[index][key]}`);    
-        } else {
-            const newError = new Error(`Key '${key}' has not been updated`);
-            newError.status = 500; 
-            next(newError); 
-        }
+app.put('/cats/:id', isIdNum, checkObjKeys, checkObjValues, (req, res, next) => {
+    const isUpdated = CatRepository.updateCatById(req.id, req.object);             // [ {}, {}, {} ]
+    if (isUpdated) {
+        console.log(`cat id ${req.id} successfully updated`)
+        res.send(isUpdated); // may need to use: res.send(JSON.stringify(updatedCat)); 
+    } else {
+        const newError = new Error(`cat id '${req.id}' not found in database`);
+        newError.status = 400; 
+        next(newError); 
     }
-
-    CatRepository.updateCats = catsToUpdate;         // object setter  
-    const updatedCat = CatRepository.getCatByIndex(index); 
-    res.send(JSON.stringify(updatedCat));           // converts JSON obj into JSON string
 });
 
 
 // DEL route
-app.delete('/cats/:id', verifyId, (req, res, next) => {
-    CatRepository.deleteCatByIndex(req.catIndex); 
-    res.status(204).send('deletion successful');
+app.delete('/cats/:id', isIdNum, (req, res, next) => {
+    const isDeleted = CatRepository.deleteCatById(req.id); 
+    if (isDeleted) {
+        res.status(204).send(`cat id ${req.id} successfully deleted`);
+    } else {
+        const newError =  new Error(`cat id '${req.id}' not found in database`)
+        newError.status = 400;
+        return next(newError)
+    }
 });
 
 // error-handling to send back error responses 

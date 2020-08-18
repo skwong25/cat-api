@@ -38,33 +38,75 @@ class CatRepository {
                 description: "white dark patches on legs, kerbside, fluffy dustbuster tail",
                 breedId: 2
             },
-        ]
+        ];
     }
+
     get getAllCats() {
         return this.cats // returns [{},{},{}]
         }
-
-    set addCat (object) {
-        let arrayToUpdate = this.getAllCats;
-        arrayToUpdate.push(object); 
-        this.cats = arrayToUpdate; 
+    
+    set setCats (catsCopy) {
+        this.cats = catsCopy; 
     }
 
-    set updateCats(updatedArray) { 
-        this.cats = updatedArray; 
-    }
-
-    getCatByIndex (index) {
-        console.log(`retrieving cat at id: ${index}`);
-        return this.cats[index];    // returns {} 
-        }
-
-    deleteCatByIndex (index) {
+    addCat (newCat) {
+        newCat.id = 5; // need to update this - how?      
         let catsCopy = this.getAllCats;
-        catsCopy.splice(index, 1);
-        this.updateCats = catsCopy; 
+        catsCopy.push(newCat); 
+        this.setCats = catsCopy; 
+    } // error-handler for what possible errors? would try...catch statements be useful? 
+    
+    getIndexById (id) { 
+        const catArray = this.getAllCats;          // catArray = [ {} , {}, {} ]
+        const catIndex = catArray.findIndex(cat => {      // findIndex() iterator 
+            console.log(`cat id: ${cat.id} + id: ${id}`)
+            return cat.id == id;                         // interchangeable with cat['id']   
+        }); 
+        console.log(catIndex);
+        if (catIndex >= 0) {
+            return catIndex; 
+        } else {
+            return null; 
+        };
+    }
+
+    getCatById (id) {
+        console.log(`retrieving cat id: ${id}`);
+        const foundIndex = this.getIndexById(id);
+        if (foundIndex !== null) {
+        console.log('cat id found in database');
+        return this.cats[foundIndex]; 
+        } else {
+        return null; 
+        }
+    }
+
+    updateCatById (id, catUpdates) {
+        const foundIndex = this.getIndexById(id);  // {name: "", sex: "", coat: ""}
+        if (foundIndex === null) {
+            return null;
+        } else {
+            let catsCopy = this.getAllCats;
+            for (let key in catUpdates) {
+                catsCopy[foundIndex][key] = catUpdates[key];
+                console.log(`updated ${key} from ${catsCopy[foundIndex][key]}`);
+            }
+            this.setCats = catsCopy; 
+            return catsCopy[foundIndex];
+        };
+    }
+
+    deleteCatById (id) {
+        const foundIndex = this.getIndexById(id);
+        if (foundIndex !== null) {
+            this.cats.splice(foundIndex, 1);
+            return true;
+        } else {
+            return false;
+        };
     }
 }
 
 module.exports = new CatRepository();
+
 
