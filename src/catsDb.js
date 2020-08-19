@@ -89,7 +89,7 @@ class CatRepository {
             let catsCopy = this.getAllCats;
             for (let key in catUpdates) {
                 catsCopy[foundIndex][key] = catUpdates[key];
-                console.log(`updated ${key} from ${catsCopy[foundIndex][key]}`);
+                console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
             }
             this.setCats = catsCopy; 
             return catsCopy[foundIndex];
@@ -99,7 +99,9 @@ class CatRepository {
     deleteCatById (id) {
         const foundIndex = this.getIndexById(id);
         if (foundIndex !== null) {
-            this.cats.splice(foundIndex, 1);
+            let catsCopy = this.getAllCats;
+            catsCopy.splice(foundIndex, 1);
+            this.setCats = catsCopy; 
             return true;
         } else {
             return false;
