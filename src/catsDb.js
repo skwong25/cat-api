@@ -51,10 +51,10 @@ class CatRepository {
 
     addCat (newCat) {
         newCat.id = 5;                       // assigns a new id number      
-        let catsCopy = this.getAllCats;     
-        catsCopy.push(newCat); 
-        this.setCats = catsCopy;
-        return newCat 
+        let catsCopy = this.getAllCats;     // gets array of existing cats 
+        catsCopy.push(newCat);             // adds cat to existing array
+        this.setCats = catsCopy;          // reassigns the new cat array to stored variable  
+        return newCat                    
     } 
     
     getIndexById (id) { 
