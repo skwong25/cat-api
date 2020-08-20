@@ -50,11 +50,12 @@ class CatRepository {
     }
 
     addCat (newCat) {
-        newCat.id = 5; // need to update this - how?      
-        let catsCopy = this.getAllCats;
+        newCat.id = 5;                       // assigns a new id number      
+        let catsCopy = this.getAllCats;     
         catsCopy.push(newCat); 
-        this.setCats = catsCopy; 
-    } // error-handler for what possible errors? would try...catch statements be useful? 
+        this.setCats = catsCopy;
+        return newCat 
+    } 
     
     getIndexById (id) { 
         const catArray = this.getAllCats;          // catArray = [ {} , {}, {} ]

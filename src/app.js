@@ -38,7 +38,7 @@ const generateErr = (value) => {
 // checks id type 
 const isIdNum = (req, res, next) => {
     console.log('id being verified');
-    const id = Number(req.params.id);                   // extracts id as a number - returns NaN if it can't 
+    const id = Number(req.params.id);                   
     if (id) {   
         req.id = id;                                       // Alt: if (typeOf(id) === "number") { ... }        
         console.log('id verified');
@@ -51,48 +51,54 @@ const isIdNum = (req, res, next) => {
 }
 
 // checks object keys are valid 
-const checkObjKeys = (req, res, next) => { 
-    const possibleKeys = ["name", "sex", "coat", "description", "breedId"]; 
+const checkObjKeys = (req, res, next) => {  
+
+    const possibleKeys = ["name", "sex", "coat", "description", "breed"];
+
+    function isKeyPresent (key) { 
+        console.log(`is ${key} present?`)
+        return possibleKeys.includes(key)
+    }
+
     const objToCheck = req.query;                // { name: "", sex: "", coat: ""}
+    console.log(objToCheck);
     arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
-    arrayOfKeys.forEach((key) => { 
-        console.log(`checking key: ${key}`)
-        const index = possibleKeys.indexOf(key);    // alternative is to use .findByIndex(callback)
-        if (index < 0) {
-            let message =  `"${key}" is not a valid property`;
-            const newError = new Error(message);
-            newError.status = 404;
-            return next(newError); 
-        } else {
-        console.log(`key '${key}' verified`)
-        }
-    });
-    console.log('object successfully checked');
-    req.object = objToCheck; 
-    next();
+    console.log(arrayOfKeys);
+
+    if (!arrayOfKeys.every(isKeyPresent)) {
+        console.log(`One or more property is invalid`);
+        let message =  `One or more property is invalid`;
+        const newError = new Error(message);
+        newError.status = 404;
+        return next(newError);
+    } else {
+        console.log('object keys checked'); 
+        req.object = objToCheck; 
+        next();
+    }
 }
 
 // checks the object values are valid 
 const checkObjValues = (req, res, next) => { 
     const objToCheck = req.query;      // { name: "", sex: "", coat: ""}
 
-    if (isInvalidString(objToCheck.name)) {     
+    if (objToCheck.name && isInvalidString(objToCheck.name)) { 
         return next(generateErr(objToCheck.name));
-    }
+    } 
 
-    if (isInvalidSex(objToCheck.sex)) {
+    if (objToCheck.sex && isInvalidSex(objToCheck.sex)) {
         return next(generateErr(objToCheck.sex));
-    }
+    } 
 
-    if (isInvalidString(objToCheck.coat)) {
+    if (objToCheck.coat && isInvalidString(objToCheck.coat)) {  
         return next(generateErr(objToCheck.coat));
     }
 
-    if (isInvalidString(objToCheck.description)) {
+    if (objToCheck.description && isInvalidString(objToCheck.description)) {
         return next(generateErr(objToCheck.description));
     }
 
-    if (isInvalidString(objToCheck.breed)) {
+    if (objToCheck.breed && isInvalidString(objToCheck.breed)) {
         return next(generateErr(objToCheck.breed));
     }
     req.object = objToCheck;            
@@ -127,8 +133,8 @@ app.get('/cats/:id', isIdNum, (req, res, next) => {
 
 // POST route 
 app.post('/cats', checkObjKeys, checkObjValues, (req, res, next) => {
-    CatRepository.addCat(req.object);
-    res.status(201).send("cat successfully added");  
+    const catWithId = CatRepository.addCat(req.object);
+    res.status(201).send(catWithId);  
 });
 
 
