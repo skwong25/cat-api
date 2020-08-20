@@ -62,13 +62,18 @@ const checkObjKeys = (req, res, next) => {
 
     const objToCheck = req.query;                // { name: "", sex: "", coat: ""}
     console.log(objToCheck);
-    arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
+    const arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
     console.log(arrayOfKeys);
+
+    if (arrayOfKeys.length < 1) {
+        const newError = new Error('no parameters provided');
+        newError.status = 404;
+        return next(newError);
+    }
 
     if (!arrayOfKeys.every(isKeyPresent)) {
         console.log(`One or more property is invalid`);
-        let message =  `One or more property is invalid`;
-        const newError = new Error(message);
+        const newError = new Error('One or more property is invalid');
         newError.status = 404;
         return next(newError);
     } else {
