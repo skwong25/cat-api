@@ -14,7 +14,7 @@ const isInvalidString = (value) => {
     if (typeof value === "string") {
         return false;
     } else {
-        return false;                     
+        return true;                     
     };                                   
 }
 // if value is undefined, then we can let it be ""; 
@@ -23,15 +23,15 @@ const isInvalidSex = (value) => {
     if (value !== 'M' || 'F') {
         return false;
     } else {
-        return false;                     
+        return true;                     
     };                                   
 }
 
 // simple JS function 
 const generateErr = (value) => {
-    let message =  `Property value "${value}" is not a valid value`;
+    let message =  `Invalid parameter: '${value}'`;
     const newError = new Error(message);
-    newError.status = 404;
+    newError.status = 400;
     return newError; 
 }
 
@@ -44,8 +44,8 @@ const isIdNum = (req, res, next) => {
         console.log('id verified');
         next() 
     } else {
-        const newError =  new Error(`cat id '${id}' is not a valid number`)
-        newError.status = 404;
+        const newError =  new Error(`'${id}' is not a valid number`)
+        newError.status = 400;
         next(newError); 
     };
 }
@@ -119,7 +119,7 @@ app.get('/cats/:id', isIdNum, (req, res, next) => {
         res.send(foundCat);
     } else {
         const newError =  new Error(`cat id '${req.id}' not found in database`)
-        newError.status = 400;
+        newError.status = 404;
         return next(newError)
     };
 });
@@ -140,7 +140,7 @@ app.put('/cats/:id', isIdNum, checkObjKeys, checkObjValues, (req, res, next) => 
         res.send(isUpdated); // may need to use: res.send(JSON.stringify(updatedCat)); 
     } else {
         const newError = new Error(`cat id '${req.id}' not found in database`);
-        newError.status = 400; 
+        newError.status = 404; 
         next(newError); 
     }
 });
@@ -150,22 +150,22 @@ app.put('/cats/:id', isIdNum, checkObjKeys, checkObjValues, (req, res, next) => 
 app.delete('/cats/:id', isIdNum, (req, res, next) => {
     const isDeleted = CatRepository.deleteCatById(req.id); 
     if (isDeleted) {
-        res.status(204).send(`cat id ${req.id} successfully deleted`);
+        res.status(204).send();
     } else {
         const newError =  new Error(`cat id '${req.id}' not found in database`)
-        newError.status = 400;
+        newError.status = 404;
         return next(newError)
     }
 });
 
-// error-handling to send back error responses 
+// error-handling sends back error responses 
 app.use((err, req, res, next) => {
-    let status = err.state || 500  
-    let message = err.message; 
+    let status = err.status || 500  
+    let message = err.message || 'test message'
     res.status(status).send(message); 
 });
 
-// set the server up (listening for reqs)
+// sets server up (listening for reqs)
 app.listen(PORT, () => { 
     console.log(`the server is listening for catcalls on port ${PORT}`)
 });
@@ -173,16 +173,6 @@ app.listen(PORT, () => {
 module.exports = app
 
 
-
-// ------- RECAP: -------
-
-// a REST API is representational state transfer 
-// server and client are stateless - meaning they are independent 
-// REST systems interact through standard operations on resources
-// clients send requests, server send responses via HTTP protocol 
-// Eg requests consist of HTTP verb, path, header
-
-// -----------------------
 
 
 // EXTRAS:
@@ -193,17 +183,3 @@ module.exports = app
 // breedId is a number 
 // coat is specific type
 // in PUT requests, if a value is the same, it doesn't need to get updated again
-
-// Unit Testing
-
-// Recap - What is What? 
-
-// Node.js is a JS runtime that allows us to run JS outside of the browser
-// A 'runtime' is something that converts high-level (human readable) code to code a computer can run. 
-// ExpressJS is a JS framework to create web servers and APIS ( application back-ends ) 
-// Jest is a JS test runner which allows us to access DOM via jsdom. (jest methods include 'describe' wrapper, 'expect' assertion)
-// jsdom is a approximation of how the browser works. 
-
-// UI tests can be written using Jest as test runner, rendered to jsdom, user interactions specified as sequences of browser events.
-// What about API tests?
-// supertest is common for testing HTTP servers on Node 

@@ -3,11 +3,9 @@
 const request = require('supertest');
 const app = require('../src/app');
 
-//==================== user API test ====================
+//==================== user API tests ====================
 
-/**
- * Testing get all user endpoint
- */
+
 describe('GET /cats', function () {
     it('respond with json object containing a list of all cats', function (done) {
         request(app)
@@ -26,27 +24,54 @@ describe('GET /cats/:id', function () {
             .expect('Content-Type', /json/)
             .expect(200, done);
     });
-
-    it('respond with 400 cat id not found', function (done) {
+    
+    it('respond with 404 cat id not found', function (done) {
         request(app)
             .get('/cats/9')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8") 
-            // .expect(400)
-            .expect(`cat id '9' not found in database`)
+            .expect(404) 
+            .expect(`cat id '9' not found in database`) 
             .end((err) => {
-                if (err) return done(err);
-                done();
+                if (err) return done(err); 
+                done();                    
+            });
+    });
+
+    it('respond with 400 invalid parameter', function (done) {
+        request(app)
+            .get('/cats/NaN')
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8") 
+            .expect(400) 
+            .expect("'NaN' is not a valid number") 
+            .end((err) => {
+                if (err) return done(err); // this error is a TEST ASSERTION ERROR
+                done();                    // not the error thrown in our code 
             });
     });
 });
 
+// if you use .end(), .expect() assertions that fail will not throw
+// instead they return the assertion as an error to the .end() callback 
+// in order to 'fail the test case' , you then need to rethrow or pass err to done()
+
 describe('DEL /cats/:id', function () {
-    it('respond with 204 cat id successfully deleted', function (done) {
+    it('respond with 204 No Content', function (done) {
         request(app)
             .delete('/cats/1')
-            .expect('test message')
-            // .expect(`cat id 1 successfully deleted`) // how does it process the ERROR message ?? 
             .expect(204, done)
     });
+
+    it('respond with 404 cat id not found', function (done) {
+        request(app)
+            .delete('/cats/9')
+            .set('Accept', "text/html; charset=utf-8")
+            .expect( 'Content-Type', "text/html; charset=utf-8")
+            .expect(`cat id '9' not found in database`) 
+            .expect(404, done)
+    });
 });
+
+// why do we need to use .end() and err? 
+
