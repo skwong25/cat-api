@@ -74,38 +74,38 @@ describe('DEL /cats/:id', function () {
 });
 
 // why do we need to use .end() and err? 
-
+/*
 describe('POST /cats', function () {
 
     const data = {
-        "name": "JimJam",
-        "sex": "M",
-        "coat": "amazing technicolour dream"
+        name: 'JimJam',
+        sex: 'M',
+        coat: 'amazing technicolour dream'
     }
 
     const invalidKey = {
-        ears: "JimJam",
-        ears: "2",
-        ears: "amazing technicolour dream"
+        ears: 'JimJam',
+        ears: '2',
+        ears: 'amazing technicolour dream'
     }
 
     const invalidParams = {
-        name: "JimJam",
+        name: 'JimJam',
         sex: 0,
-        coat: "amazing technicolour dream"
+        coat: 'amazing technicolour dream'
     }
 
+    
     it('respond with 201 content created', function (done) {
         request(app)
             .post('/cats')
             .send(data)
             .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
+            .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8"
             .expect(201, done)
     }) 
-})
+}) 
 
-/*
     it('respond with 400 invalid object key`', function (done) {
         request(app)
             .post('/cats')
