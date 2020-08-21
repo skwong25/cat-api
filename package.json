@@ -4,7 +4,8 @@
   "description": "API to process HTTP requests to access information on local cats",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www",
+    "test": "mocha 'test/apiTest.js'" 
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "eslint": "^7.6.0"
+    "eslint": "^7.6.0",
+    "supertest": "^4.0.2"
   }
 }
+
