@@ -11,20 +11,12 @@ const { deleteCatByIndex } = require('./catsDb.js');
 
 // simple JS function 
 const isInvalidString = (value) => {
-    if (typeof value === "string") {
-        return false;
-    } else {
-        return true;                     
-    };                                   
+    return typeof value !== "string"                                  
 }
-// if value is undefined, then we can let it be ""; 
 
 const isInvalidSex = (value) => {
-    if (value !== 'M' || 'F') {
-        return false;
-    } else {
-        return true;                     
-    };                                   
+    const genders = ['M', 'F', 'N'];
+    return !genders.includes(value);                                 
 }
 
 // simple JS function 
@@ -50,7 +42,7 @@ const isIdNum = (req, res, next) => {
     };
 }
 
-// checks object keys are valid 
+// checks object keys  
 const checkObjKeys = (req, res, next) => {  
 
     const possibleKeys = ["name", "sex", "coat", "description", "breed"];
@@ -83,29 +75,22 @@ const checkObjKeys = (req, res, next) => {
     }
 }
 
-// checks the object values are valid 
+// checks object values 
 const checkObjValues = (req, res, next) => { 
     const objToCheck = req.query;      // { name: "", sex: "", coat: ""}
 
-    if (objToCheck.name && isInvalidString(objToCheck.name)) { 
-        return next(generateErr(objToCheck.name));
-    } 
-
-    if (objToCheck.sex && isInvalidSex(objToCheck.sex)) {
-        return next(generateErr(objToCheck.sex));
-    } 
-
-    if (objToCheck.coat && isInvalidString(objToCheck.coat)) {  
-        return next(generateErr(objToCheck.coat));
+    for (let key in objToCheck) {
+        if (key === "sex") {
+            if (isInvalidSex(objToCheck.sex)) {
+                return next(generateErr(objToCheck.sex));
+            } 
+        } else {
+            if (isInvalidString(objToCheck.key)) { 
+                return next(generateErr(objToCheck.key));
+            } 
+        };
     }
 
-    if (objToCheck.description && isInvalidString(objToCheck.description)) {
-        return next(generateErr(objToCheck.description));
-    }
-
-    if (objToCheck.breed && isInvalidString(objToCheck.breed)) {
-        return next(generateErr(objToCheck.breed));
-    }
     req.object = objToCheck;            
     console.log('object values checked');     
     next();
