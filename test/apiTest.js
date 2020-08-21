@@ -74,7 +74,7 @@ describe('DEL /cats/:id', function () {
 });
 
 // why do we need to use .end() and err? 
-
+/*
 describe('POST /cats', function () {
 
     const data = {
@@ -95,7 +95,7 @@ describe('POST /cats', function () {
         coat: 'amazing technicolour dream'
     }
 
-    /*
+    
     it('respond with 201 content created', function (done) {
         request(app)
             .post('/cats')
@@ -105,7 +105,6 @@ describe('POST /cats', function () {
             .expect(201, done)
     }) 
 }) 
-
 
     it('respond with 400 invalid object key`', function (done) {
         request(app)
