@@ -3,11 +3,15 @@
 const express = require('express');         // imports express lib module
 const app = express();                     // express() instantiates app 
 const morgan = require('morgan');
+const bodyParser = require('body-parser')
 
 const CatRepository = require('./catsDb.js'); // class instance / object  
 const breeds = require('./breedsDb.js');
 const { deleteCatByIndex } = require('./catsDb.js');
 
+app.use(express.json());
+// app.use(bodyParser.urlencoded({extended: true})); // if we have this, we should send data as urlencoded in Postman 
+app.use(bodyParser.json()) // automatically attaches parsed JSON object to req.body - should send data as raw in Postman
 
 // simple JS function 
 const isInvalidString = (value) => {
@@ -47,12 +51,12 @@ const checkObjKeys = (req, res, next) => {
 
     const possibleKeys = ["name", "sex", "coat", "description", "breed"];
 
-    function isKeyPresent (key) { 
+    function keyNotPresent (key) { 
         console.log(`is ${key} present?`)
-        return possibleKeys.includes(key)
+        return !possibleKeys.includes(key) // returns true if key is NOT one of the possibleKeys
     }
 
-    const objToCheck = req.query;                // { name: "", sex: "", coat: ""}
+    const objToCheck = req.body;                // { name: "", sex: "", coat: ""}
     console.log(objToCheck);
     const arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
     console.log(arrayOfKeys);
@@ -63,10 +67,12 @@ const checkObjKeys = (req, res, next) => {
         return next(newError);
     }
 
-    if (!arrayOfKeys.every(isKeyPresent)) {
-        console.log(`One or more property is invalid`);
-        const newError = new Error('One or more property is invalid');
-        newError.status = 404;
+    let invalidKey = arrayOfKeys.filter(keyNotPresent); // returns an array of elements that meet the criteria 
+
+    if (invalidKey[0]) { 
+        console.log(`Property '${invalidKey[0]}' is invalid`);
+        const newError = new Error(`Property '${invalidKey[0]}' is invalid`);
+        newError.status = 400;
         return next(newError);
     } else {
         console.log('object keys checked'); 
@@ -77,16 +83,18 @@ const checkObjKeys = (req, res, next) => {
 
 // checks object values 
 const checkObjValues = (req, res, next) => { 
-    const objToCheck = req.query;      // { name: "", sex: "", coat: ""}
+    const objToCheck = req.body;      // { name: "", sex: "", coat: ""}
 
     for (let key in objToCheck) {
         if (key === "sex") {
-            if (isInvalidSex(objToCheck.sex)) {
+            if (isInvalidSex(objToCheck.sex)) { 
+                console.log('invalid sex parameter');
                 return next(generateErr(objToCheck.sex));
             } 
         } else {
-            if (isInvalidString(objToCheck.key)) { 
-                return next(generateErr(objToCheck.key));
+            if (isInvalidString(objToCheck[key])) { 
+                console.log(`invalid ${key} parameter: ${objToCheck[key]}`);
+                return next(generateErr(objToCheck[key]));
             } 
         };
     }

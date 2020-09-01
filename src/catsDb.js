@@ -63,7 +63,7 @@ class CatRepository {
             console.log(`cat id: ${cat.id} + id: ${id}`)
             return cat.id == id;                         // interchangeable with cat['id']   
         }); 
-        console.log(catIndex);
+        console.log(`Cat Index: ${catIndex}`);
         if (catIndex >= 0) {
             return catIndex; 
         } else {
@@ -89,8 +89,10 @@ class CatRepository {
         } else {
             let catsCopy = this.getAllCats;
             for (let key in catUpdates) {
-                catsCopy[foundIndex][key] = catUpdates[key];
-                console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
+                if (catUpdates[key] !== catsCopy[foundIndex][key]) { 
+                    catsCopy[foundIndex][key] = catUpdates[key];
+                    console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
+                }
             }
             this.setCats = catsCopy; 
             return catsCopy[foundIndex];
