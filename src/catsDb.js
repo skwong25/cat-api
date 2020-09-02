@@ -1,8 +1,6 @@
 
 // class 'CatRepository' serves as a template for creating new cat objects with props & methods
 
-const { splice } = require("./breedsDb");
-
 class CatRepository {
     constructor() {
         this.cats = [ // array of objects - if object, change to >> this.cats:{ 1:{}, 2:{}, 3:{}}
@@ -41,7 +39,7 @@ class CatRepository {
         ];
     }
 
-    get getAllCats() {
+    get getCats() {
         return this.cats // returns [{},{},{}]
         }
     
@@ -49,16 +47,36 @@ class CatRepository {
         this.cats = catsCopy; 
     }
 
+
+    getAllCats() {
+        const catCopy = this.getCats;  
+        console.log("we have copied the cat array from the database");
+        const catSummaryObj = (object) => {    // factory function 
+            return {
+                id: object['id'],
+                name: object['name']
+            }
+        }
+        let summaryArray = []; 
+        console.log(`summary array = ${summaryArray}`);
+        for (let i = 0; i < catCopy.length; i++ ) {
+            summaryArray.push(catSummaryObj(catCopy[i]))
+            console.log(`summary array = ${summaryArray}`);
+        } 
+        console.log(`final summary array = ${summaryArray}`);
+        return summaryArray;
+    }
+
     addCat (newCat) {
         newCat.id = 5;                       // assigns a new id number      
-        let catsCopy = this.getAllCats;     // gets array of existing cats 
+        let catsCopy = this.getCats;     // gets array of existing cats 
         catsCopy.push(newCat);             // adds cat to existing array
         this.setCats = catsCopy;          // reassigns the new cat array to stored variable  
         return newCat                    
     } 
     
     getIndexById (id) { 
-        const catArray = this.getAllCats;          // catArray = [ {} , {}, {} ]
+        const catArray = this.getCats;          // catArray = [ {} , {}, {} ]
         const catIndex = catArray.findIndex(cat => {      // findIndex() iterator 
             console.log(`cat id: ${cat.id} + id: ${id}`)
             return cat.id == id;                         // interchangeable with cat['id']   
@@ -87,7 +105,7 @@ class CatRepository {
         if (foundIndex === null) {
             return null;
         } else {
-            let catsCopy = this.getAllCats;
+            let catsCopy = this.getCats;
             for (let key in catUpdates) {
                 if (catUpdates[key] !== catsCopy[foundIndex][key]) { 
                     catsCopy[foundIndex][key] = catUpdates[key];
@@ -102,7 +120,7 @@ class CatRepository {
     deleteCatById (id) {
         const foundIndex = this.getIndexById(id);
         if (foundIndex !== null) {
-            let catsCopy = this.getAllCats;
+            let catsCopy = this.getCats;
             catsCopy.splice(foundIndex, 1);
             this.setCats = catsCopy; 
             return true;
