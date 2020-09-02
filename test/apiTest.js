@@ -1,4 +1,4 @@
-// next we will write an API test for GET by id, DEL by id, POST and PUT routes: 
+// next we will write an API test for '/breed routes' GET and GET by id: 
 
 const request = require('supertest');
 const app = require('../src/app');
@@ -7,7 +7,7 @@ const app = require('../src/app');
 
 
 describe('GET /cats', function () {
-    it('respond with json object containing a list of all cats', function (done) {
+    it('responds with json object containing a list of cat ids and name only', function (done) {
         request(app)
             .get('/cats')
             .set('Accept', 'application/json')
@@ -17,7 +17,7 @@ describe('GET /cats', function () {
 });
 
 describe('GET /cats/:id', function () {
-    it('respond with json object containing information on a single cat', function (done) {
+    it('respond with json object containing detailed information on a single cat', function (done) {
         request(app)
             .get('/cats/1')
             .set('Accept', 'application/json')
@@ -144,8 +144,30 @@ describe('POST /cats', function () {
     })
 })
 
+describe('GET /breeds', function () {
+    it('respond with json object containing a list of all breeds', function (done) {
+        request(app)
+            .get('/breeds')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
+    });
+});
 
+describe('GET /breeds/:breedId', function () {
+    it('respond with json object containing information on a single breed', function (done) {
+        request(app)
+            .get('/breeds/1')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
+    });
 
-
-
-
+    it('respond with 404 not found - invalid breed id', function (done) {
+        request(app)
+            .get('/breeds/9')
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(404, "breed id '9' not found in database", done);
+    });
+})

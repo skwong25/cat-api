@@ -37,6 +37,19 @@ const isIdNum = (req, res, next) => {
     };
 }
 
+// checks object data format
+const checkObjFormat = (req, res, next) => {
+    const objectConstructor = ({}).constructor;
+    if (req.body.constructor === objectConstructor) {
+        console.log("verified request data is an object")
+        next();
+    } else {
+        const newError = new Error ('Request data is not an object - check format');
+        newError.status = 400;
+        return next(newError);
+    }
+}
+
 // checks object keys  
 const checkObjKeys = (req, res, next) => {  
 
@@ -46,6 +59,7 @@ const checkObjKeys = (req, res, next) => {
         console.log(`is ${key} present?`)
         return !possibleKeys.includes(key) // returns true if key is NOT one of the possibleKeys
     }
+
 
     const objToCheck = req.body;                // { name: "", sex: "", coat: ""}
     console.log(objToCheck);
@@ -116,14 +130,14 @@ catsRouter.get('/:id', isIdNum, (req, res, next) => {
 
 
 // POST route 
-catsRouter.post('', checkObjKeys, checkObjValues, (req, res, next) => {
+catsRouter.post('', checkObjFormat, checkObjKeys, checkObjValues, (req, res, next) => {
     const catWithId = CatRepository.addCat(req.object);
     res.status(201).send(catWithId);  
 });
 
 
 // PUT route - allows user to add/update information by id
-catsRouter.put('/:id', isIdNum, checkObjKeys, checkObjValues, (req, res, next) => {
+catsRouter.put('/:id', isIdNum, checkObjFormat, checkObjKeys, checkObjValues, (req, res, next) => {
     const isUpdated = CatRepository.updateCatById(req.id, req.object);             // [ {}, {}, {} ]
     if (isUpdated) {
         console.log(`cat id '${req.id}' successfully updated`)
