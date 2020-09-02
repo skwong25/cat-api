@@ -41,4 +41,9 @@ module.exports = app
 // checks that can also be controlled in the UI:
 // breedId is a number 
 // coat is specific type
-// in PUT requests, if a value is the same, it doesn't need to get updated again
+
+// How do we verify that request data in PUT/POST requests is a JSON object?
+// The bodyparser recognises JSON and parse it into an object attached to req.body 
+// If request data is wrongly formatted, req.body remains empty. This is picked up by 'checkObjKeys' middleware function and generates an error. 
+// Otherwise we can check the constructor attribute:
+// https://stackoverflow.com/questions/11182924/how-to-check-if-javascript-object-is-json

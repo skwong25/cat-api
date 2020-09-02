@@ -1,4 +1,3 @@
-
 // class 'CatRepository' serves as a template for creating new cat objects with props & methods
 
 class CatRepository {
@@ -7,32 +6,32 @@ class CatRepository {
             {
                 id: 1,
                 name: "Catty",
-                sex: "F",
-                coat: "medium hair",
+                ageInYears: 1,
+                favouriteToy: "grass",
                 description: "buff or tan, skinny, talkative, often found in tall grasses or deep in the bush",
                 breedId: 1
             },
             {
                 id: 2,
                 name: "Frank",
-                sex: "M",
-                coat: "medium hair",
+                ageInYears: 5,
+                favouriteToy: "flies",
                 description: "orange, heavy-set, non-responsive except to neck scratches",
                 breedId: 1
             },
             {
                 id: 3,
                 name: "Pancake",
-                sex: "M",
-                coat: "shorthair",
+                ageInYears: 4,
+                favouriteToy: "pavement",
                 description: "brown, heavy-set, spent life behind bars",
                 breedId: 1
             },
             {
                 id: 4,
                 name: "Madame Floof",
-                sex: "F",
-                coat: "long hair",
+                ageInYears: 1,
+                favouriteToy: "ball",
                 description: "white dark patches on legs, kerbside, fluffy dustbuster tail",
                 breedId: 2
             },
@@ -107,7 +106,7 @@ class CatRepository {
         } else {
             let catsCopy = this.getCats;
             for (let key in catUpdates) {
-                if (catUpdates[key] !== catsCopy[foundIndex][key]) { 
+                if (catUpdates[key] !== catsCopy[foundIndex][key]) {    // if a value is the same, it won't be updated 
                     catsCopy[foundIndex][key] = catUpdates[key];
                     console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
                 }

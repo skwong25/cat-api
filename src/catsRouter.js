@@ -9,9 +9,8 @@ const isInvalidString = (value) => {
     return typeof value !== "string"                                  
 }
 
-const isInvalidSex = (value) => {
-    const genders = ['M', 'F', 'N'];
-    return !genders.includes(value);                                 
+const isInvalidNum = (value) => {
+    return typeof(value) !== "number";                              
 }
 
 // simple JS function 
@@ -53,7 +52,7 @@ const checkObjFormat = (req, res, next) => {
 // checks object keys  
 const checkObjKeys = (req, res, next) => {  
 
-    const possibleKeys = ["name", "sex", "coat", "description", "breed"];
+    const possibleKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
 
     function keyNotPresent (key) { 
         console.log(`is ${key} present?`)
@@ -61,9 +60,9 @@ const checkObjKeys = (req, res, next) => {
     }
 
 
-    const objToCheck = req.body;                // { name: "", sex: "", coat: ""}
+    const objToCheck = req.body;                
     console.log(objToCheck);
-    const arrayOfKeys = Object.keys(objToCheck);      // Eg: [ "name", "sex", "coat"]
+    const arrayOfKeys = Object.keys(objToCheck);      
     console.log(arrayOfKeys);
 
     if (arrayOfKeys.length < 1) {
@@ -88,17 +87,17 @@ const checkObjKeys = (req, res, next) => {
 
 // checks object values 
 const checkObjValues = (req, res, next) => { 
-    const objToCheck = req.body;      // { name: "", sex: "", coat: ""}
+    const objToCheck = req.body;      // { name: "", ageInYears: "", favouriteToy: ""}
 
     for (let key in objToCheck) {
-        if (key === "sex") {
-            if (isInvalidSex(objToCheck.sex)) { 
-                console.log('invalid sex parameter');
-                return next(generateErr(objToCheck.sex));
+        if (key === "ageInYears") {
+            if (isInvalidNum(objToCheck.ageInYears)) { 
+                console.log(`invalid age value: ${objToCheck.ageInYears}`);
+                return next(generateErr(objToCheck.ageInYears));
             } 
         } else {
             if (isInvalidString(objToCheck[key])) { 
-                console.log(`invalid ${key} parameter: ${objToCheck[key]}`);
+                console.log(`invalid ${key} value: ${objToCheck[key]}`);
                 return next(generateErr(objToCheck[key]));
             } 
         };

@@ -58,19 +58,34 @@ describe('GET /cats/:id', function () {
 
 describe('PUT /cats/:id', function () {
 
-    const sexChange = {
+    const overdueBirthday = {
         "name": "Catty",
-        "sex": "M",
-        "coat": "medium hair"
+        "ageInYears": 2,
+        "favouriteToy": "grass"
     }
 
-    it('responds with 200 and updated cat gender only', function (done) {
+    const falseBirthday = {
+        "name": "Catty",
+        "ageInYears": "two",
+        "favouriteToy": "grass"
+    }
+
+    it('responds with 200  - updates age only', function (done) {
         request(app)
             .put('/cats/1')
-            .send(sexChange)
+            .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
-            .expect('Content-Type', /json/)  
+            .expect('Content-Type', /json/)  // Error: expected "Content-Type" matching /json/, got "text/html; charset=utf-8" - do I need to JSON.parse() ? 
             .expect(200, done)
+    }); 
+
+    it('responds with 400 bad request - age is incorrect format', function (done) {
+        request(app)
+            .put('/cats/1')
+            .send(falseBirthday)
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(400, "Invalid parameter: 'two'", done)
     }); 
 })
 
@@ -95,8 +110,8 @@ describe('POST /cats', function () {
 
     const body = {
         "name": "JimJam",
-        "sex": "M",
-        "coat": "amazing technicolour dream"
+        "ageInYears": 5,
+        "favouriteToy": "amazing technicolour dreamcoat"
     }
 
     const invalidKey = {
@@ -107,8 +122,8 @@ describe('POST /cats', function () {
 
     const invalidParams = {
         "name": "JimJam",
-        "sex": "0",
-        "coat": "amazing technicolour dream"
+        "ageInYears": "five",
+        "favouriteToy": "amazing technicolour dream"
     }
 
     
@@ -140,7 +155,7 @@ describe('POST /cats', function () {
             .send(invalidParams)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400, "Invalid parameter: '0'", done)
+            .expect(400, "Invalid parameter: 'five'", done)
     })
 })
 
