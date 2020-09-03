@@ -18,7 +18,7 @@ class BreedRepository {
         return this.breeds;
     }
 
-    getBreedById(id) {
+    getBreedById (id) {
         const breedsCopy = this.getAllBreeds; 
         const idMatchArray = breedsCopy.filter((breed) => { 
             return breed['breedId'] == id; 

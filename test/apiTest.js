@@ -75,7 +75,7 @@ describe('PUT /cats/:id', function () {
             .put('/cats/1')
             .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
-            .expect('Content-Type', /json/)  // Error: expected "Content-Type" matching /json/, got "text/html; charset=utf-8" - do I need to JSON.parse() ? 
+            .expect('Content-Type', /json/)  
             .expect(200, done)
     }); 
 
@@ -132,7 +132,7 @@ describe('POST /cats', function () {
             .post('/cats')
             .send(body)
             .set('Accept', 'application/x-www-form-urlencoded')
-            // .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8"
+            // .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8" // FIXIT - what is going on here?
             .expect(201, done)
     }) 
  

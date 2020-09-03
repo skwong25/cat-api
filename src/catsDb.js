@@ -40,29 +40,22 @@ class CatRepository {
 
     get getCats() {
         return this.cats // returns [{},{},{}]
-        }
+    }
     
-    set setCats (catsCopy) {
+    set setCats(catsCopy) {
         this.cats = catsCopy; 
     }
 
-
-    getAllCats() {
+    getAllCats () { // we need a summary object of each cat. 
         const catCopy = this.getCats;  
-        console.log("we have copied the cat array from the database");
-        const catSummaryObj = (object) => {    // factory function 
+        console.log("Copied cat array from database"); 
+        const summaryArray = catCopy.map((object) => {
             return {
-                id: object['id'],
+                id: object['id'],   
                 name: object['name']
             }
-        }
-        let summaryArray = []; 
-        console.log(`summary array = ${summaryArray}`);
-        for (let i = 0; i < catCopy.length; i++ ) {
-            summaryArray.push(catSummaryObj(catCopy[i]))
-            console.log(`summary array = ${summaryArray}`);
-        } 
-        console.log(`final summary array = ${summaryArray}`);
+        })
+        console.log(`Final summary array = ${summaryArray}`);
         return summaryArray;
     }
 
@@ -106,7 +99,7 @@ class CatRepository {
         } else {
             let catsCopy = this.getCats;
             for (let key in catUpdates) {
-                if (catUpdates[key] !== catsCopy[foundIndex][key]) {    // if a value is the same, it won't be updated 
+                if (catUpdates[key] !== catsCopy[foundIndex][key]) {    // ensures that if a value is the same, it won't be updated 
                     catsCopy[foundIndex][key] = catUpdates[key];
                     console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
                 }

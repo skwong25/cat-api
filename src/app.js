@@ -5,7 +5,7 @@ const app = express();                     // express() instantiates app
 const morgan = require('morgan');
 const bodyParser = require('body-parser')
 
-app.use(express.json());        // app.use(bodyParser.urlencoded({extended: true})); // if we have this, we should send data as urlencoded in Postman 
+app.use(express.json());        
 app.use(bodyParser.json())      // automatically attaches parsed JSON object to req.body - should send data as raw in Postman
 
 const catsRouter = require('./catsRouter.js');

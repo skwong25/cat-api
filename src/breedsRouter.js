@@ -13,7 +13,7 @@ const isBreedId = (req, res, next) => {
         console.log('breed id verified');
         next() 
     } else {
-        const newError =  new Error(`'${id}' is not a valid number`) // NaN - we need to convert it into a valid number first  
+        const newError =  new Error(`'${id}' is not a valid number`)
         newError.status = 400;
         next(newError); 
     };
@@ -27,9 +27,9 @@ breedsRouter.get('', (req, res, next) => {
 
 // GET breed by id
 breedsRouter.get('/:breedId', isBreedId, (req, res, next) => {
-    const foundBreed = BreedRepository.getBreedById(req.breedId); // should return object - how do we check this? 
+    const foundBreed = BreedRepository.getBreedById(req.breedId); 
     if (foundBreed) {  
-        res.send(foundBreed); // in the test, can we expect this to be an object? 
+        res.send(foundBreed); // TODO - in the test, can we expect this to be an object? 
     } else {
         const newError = new Error(`breed id '${req.breedId}' not found in database`)
         newError.status = 404;
