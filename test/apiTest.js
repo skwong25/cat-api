@@ -56,6 +56,24 @@ describe('GET /cats/:id', function () {
 // instead they return the assertion as an error to the .end() callback 
 // in order to 'fail the test case' , you then need to rethrow or pass err to done()
 
+describe('PUT /cats/:id', function () {
+
+    const sexChange = {
+        "name": "Catty",
+        "sex": "M",
+        "coat": "medium hair"
+    }
+
+    it('responds with 200 and updated cat gender only', function (done) {
+        request(app)
+            .put('/cats/1')
+            .send(sexChange)
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', /json/)  
+            .expect(200, done)
+    }); 
+})
+
 describe('DEL /cats/:id', function () {
     it('respond with 204 No Content', function (done) {
         request(app)
@@ -73,45 +91,43 @@ describe('DEL /cats/:id', function () {
     });
 });
 
-// why do we need to use .end() and err? 
-/*
 describe('POST /cats', function () {
 
-    const data = {
-        name: 'JimJam',
-        sex: 'M',
-        coat: 'amazing technicolour dream'
+    const body = {
+        "name": "JimJam",
+        "sex": "M",
+        "coat": "amazing technicolour dream"
     }
 
     const invalidKey = {
-        ears: 'JimJam',
-        ears: '2',
-        ears: 'amazing technicolour dream'
+        "ears": "JimJam",
+        "ears": "2",
+        "ears": "amazing technicolour dream"
     }
 
     const invalidParams = {
-        name: 'JimJam',
-        sex: 0,
-        coat: 'amazing technicolour dream'
+        "name": "JimJam",
+        "sex": "0",
+        "coat": "amazing technicolour dream"
     }
 
     
     it('respond with 201 content created', function (done) {
         request(app)
             .post('/cats')
-            .send(data)
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8"
+            .send(body)
+            .set('Accept', 'application/x-www-form-urlencoded')
+            // .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8"
             .expect(201, done)
     }) 
-}) 
+ 
 
-    it('respond with 400 invalid object key`', function (done) {
+    it('respond with 400 - invalid key', function (done) {
         request(app)
             .post('/cats')
-            .send({ empty: ''})
+            .send(invalidKey)
             .expect(400)
-            .expect("One or more property is invalid")
+            .expect(`Property 'ears' is invalid`)
             .end((err) => {
                 if (err) return done(err); 
                 done();                     
@@ -126,8 +142,9 @@ describe('POST /cats', function () {
             .expect('Content-Type', "text/html; charset=utf-8")
             .expect(400, "Invalid parameter: '0'", done)
     })
+})
 
-*/
+
 
 
 
