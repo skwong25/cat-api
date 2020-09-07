@@ -2,8 +2,9 @@
 
 const express = require('express');         // imports express lib module
 const app = express();                     // express() instantiates app 
-const morgan = require('morgan');
-const bodyParser = require('body-parser')
+
+const morgan = require('morgan');         // helper node modules
+const bodyParser = require('body-parser');
 
 app.use(express.json());        
 app.use(bodyParser.json())      // automatically attaches parsed JSON object to req.body - should send data as raw in Postman

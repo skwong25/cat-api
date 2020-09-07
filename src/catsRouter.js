@@ -2,7 +2,11 @@
 const express = require('express');  
 const catsRouter = express.Router();
 
-const CatRepository = require('./catsDb.js');
+const shortid = require('shortid');
+
+const importObject = require('./catsDb'); // note that module.exports = {catClass: CatClass}
+const CatClass = importObject.catClass; 
+const catRepository = new CatClass(shortid.generate);  // class instantiation
 
 // simple JS function 
 const isInvalidString = (value) => {
@@ -52,13 +56,12 @@ const checkObjFormat = (req, res, next) => {
 // checks object keys  
 const checkObjKeys = (req, res, next) => {  
 
-    const possibleKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
+    const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
 
     function keyNotPresent (key) { 
         console.log(`is ${key} present?`)
-        return !possibleKeys.includes(key) // returns true if key is NOT one of the possibleKeys
+        return !validKeys.includes(key) // returns true if key is NOT one of the possibleKeys
     }
-
 
     const objToCheck = req.body;                
     console.log(objToCheck);
@@ -83,7 +86,7 @@ const checkObjKeys = (req, res, next) => {
         req.object = objToCheck; 
         next();
     }
-}
+} // FIXME this seems convoluted just to check if an object key is valid
 
 // checks object values 
 const checkObjValues = (req, res, next) => { 
@@ -110,13 +113,13 @@ const checkObjValues = (req, res, next) => {
 
 // GET route all 
 catsRouter.get('', (req, res, next) => {
-    const cats = CatRepository.getAllCats();  //should return summary object
+    const cats = catRepository.getAllCats();  //should return summary object
     res.json({"cats": cats}); 
 });
 
 // GET route by id 
 catsRouter.get('/:id', isIdNum, (req, res, next) => {
-    const foundCat = CatRepository.getCatById(req.id); 
+    const foundCat = catRepository.getCatById(req.id); 
     if (foundCat) {
         console.log('cat retrieved:' + foundCat);
         res.send(foundCat);
@@ -130,14 +133,14 @@ catsRouter.get('/:id', isIdNum, (req, res, next) => {
 
 // POST route 
 catsRouter.post('', checkObjFormat, checkObjKeys, checkObjValues, (req, res, next) => {
-    const catWithId = CatRepository.addCat(req.object);
+    const catWithId = catRepository.addCat(req.object);
     res.status(201).send(catWithId);  
 });
 
 
 // PUT route - allows user to add/update information by id
 catsRouter.put('/:id', isIdNum, checkObjFormat, checkObjKeys, checkObjValues, (req, res, next) => {
-    const isUpdated = CatRepository.updateCatById(req.id, req.object);             // [ {}, {}, {} ]
+    const isUpdated = catRepository.updateCatById(req.id, req.object);             // [ {}, {}, {} ]
     if (isUpdated) {
         console.log(`cat id '${req.id}' successfully updated`)
         res.send(isUpdated); // may need to use: res.send(JSON.stringify(updatedCat)); 
@@ -151,7 +154,7 @@ catsRouter.put('/:id', isIdNum, checkObjFormat, checkObjKeys, checkObjValues, (r
 
 // DEL route
 catsRouter.delete('/:id', isIdNum, (req, res, next) => {
-    const isDeleted = CatRepository.deleteCatById(req.id); 
+    const isDeleted = catRepository.deleteCatById(req.id); 
     if (isDeleted) {
         res.status(204).send();
     } else {

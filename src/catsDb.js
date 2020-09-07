@@ -1,10 +1,13 @@
-// class 'CatRepository' serves as a template for creating new cat objects with props & methods
+// class 'CatClass' serves as a template for creating new cat objects with props & methods
+// example of dependancy injection:
 
-class CatRepository {
-    constructor() {
-        this.cats = [ // array of objects - if object, change to >> this.cats:{ 1:{}, 2:{}, 3:{}}
-            {
-                id: 1,
+
+class CatClass {
+    constructor(idGenerator) { // to generate a new class: const newCatRepo = new CatRepository() < pass idGenerator in as an argument 
+        this.generateId = idGenerator;
+        this.cats = [
+            {   
+                id: this.generateId(),
                 name: "Catty",
                 ageInYears: 1,
                 favouriteToy: "grass",
@@ -12,7 +15,7 @@ class CatRepository {
                 breedId: 1
             },
             {
-                id: 2,
+                id: this.generateId(),
                 name: "Frank",
                 ageInYears: 5,
                 favouriteToy: "flies",
@@ -20,7 +23,7 @@ class CatRepository {
                 breedId: 1
             },
             {
-                id: 3,
+                id: this.generateId(),
                 name: "Pancake",
                 ageInYears: 4,
                 favouriteToy: "pavement",
@@ -28,7 +31,7 @@ class CatRepository {
                 breedId: 1
             },
             {
-                id: 4,
+                id: this.generateId(),
                 name: "Madame Floof",
                 ageInYears: 1,
                 favouriteToy: "ball",
@@ -60,8 +63,8 @@ class CatRepository {
     }
 
     addCat (newCat) {
-        newCat.id = 5;                       // assigns a new id number      
-        let catsCopy = this.getCats;     // gets array of existing cats 
+        newCat.id = this.generateId();        // assigns unique id      
+        let catsCopy = this.getCats;        // gets array of existing cats 
         catsCopy.push(newCat);             // adds cat to existing array
         this.setCats = catsCopy;          // reassigns the new cat array to stored variable  
         return newCat                    
@@ -77,14 +80,14 @@ class CatRepository {
         if (catIndex >= 0) {
             return catIndex; 
         } else {
-            return null; 
+            return null; // TODO - check if we can DRY this check for id. We are passing a lot of 'nulls' around. catIndex is either an index or -1. 
         };
     }
 
     getCatById (id) {
         console.log(`retrieving cat id: ${id}`);
         const foundIndex = this.getIndexById(id);
-        if (foundIndex !== null) {
+        if (foundIndex !== null) {  
         console.log('cat id found in database');
         return this.cats[foundIndex]; 
         } else {
@@ -122,6 +125,15 @@ class CatRepository {
     }
 }
 
-module.exports = new CatRepository();
+module.exports.catClass = CatClass
+// export a class by attaching it as a property of the module.exports object 
 
+
+// Note that if a module is imported multiple times, but with the same specifier (i.e. path), 
+// the JavaScript specification guarantees that you’ll receive the same module instance. 
+// Above, we should expect that although the class instance is imported in app.js AND catsRouter, it will be the same instance. 
+
+// (and is that instance changeable and the changes stored?)
+// or should I import it into app.js and then re-export into catsRouter as something else? 
+// let's try it! 
 
