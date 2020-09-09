@@ -1,4 +1,4 @@
-// next we will write an API test for GET by id, DEL by id, POST and PUT routes: 
+// next we will write an API test for '/breed routes' GET and GET by id: 
 
 const request = require('supertest');
 const app = require('../src/app');
@@ -7,7 +7,7 @@ const app = require('../src/app');
 
 
 describe('GET /cats', function () {
-    it('respond with json object containing a list of all cats', function (done) {
+    it('responds with json object containing a list of cat ids and name only', function (done) {
         request(app)
             .get('/cats')
             .set('Accept', 'application/json')
@@ -17,7 +17,7 @@ describe('GET /cats', function () {
 });
 
 describe('GET /cats/:id', function () {
-    it('respond with json object containing information on a single cat', function (done) {
+    it('respond with json object containing detailed information on a single cat', function (done) {
         request(app)
             .get('/cats/1')
             .set('Accept', 'application/json')
@@ -58,19 +58,34 @@ describe('GET /cats/:id', function () {
 
 describe('PUT /cats/:id', function () {
 
-    const sexChange = {
+    const overdueBirthday = {
         "name": "Catty",
-        "sex": "M",
-        "coat": "medium hair"
+        "ageInYears": 2,
+        "favouriteToy": "grass"
     }
 
-    it('responds with 200 and updated cat gender only', function (done) {
+    const falseBirthday = {
+        "name": "Catty",
+        "ageInYears": "two",
+        "favouriteToy": "grass"
+    }
+
+    it('responds with 200  - updates age only', function (done) {
         request(app)
             .put('/cats/1')
-            .send(sexChange)
+            .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', /json/)  
             .expect(200, done)
+    }); 
+
+    it('responds with 400 bad request - age is incorrect format', function (done) {
+        request(app)
+            .put('/cats/1')
+            .send(falseBirthday)
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(400, "Invalid parameter: 'two'", done)
     }); 
 })
 
@@ -95,8 +110,8 @@ describe('POST /cats', function () {
 
     const body = {
         "name": "JimJam",
-        "sex": "M",
-        "coat": "amazing technicolour dream"
+        "ageInYears": 5,
+        "favouriteToy": "amazing technicolour dreamcoat"
     }
 
     const invalidKey = {
@@ -107,8 +122,8 @@ describe('POST /cats', function () {
 
     const invalidParams = {
         "name": "JimJam",
-        "sex": "0",
-        "coat": "amazing technicolour dream"
+        "ageInYears": "five",
+        "favouriteToy": "amazing technicolour dream"
     }
 
     
@@ -117,7 +132,7 @@ describe('POST /cats', function () {
             .post('/cats')
             .send(body)
             .set('Accept', 'application/x-www-form-urlencoded')
-            // .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8"
+            // .expect('Content-Type', /json/) // API Test Error: got "text/html; charset=utf-8" // FIXIT - what is going on here?
             .expect(201, done)
     }) 
  
@@ -140,12 +155,34 @@ describe('POST /cats', function () {
             .send(invalidParams)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400, "Invalid parameter: '0'", done)
+            .expect(400, "Invalid parameter: 'five'", done)
     })
 })
 
+describe('GET /breeds', function () {
+    it('respond with json object containing a list of all breeds', function (done) {
+        request(app)
+            .get('/breeds')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
+    });
+});
 
+describe('GET /breeds/:breedId', function () {
+    it('respond with json object containing information on a single breed', function (done) {
+        request(app)
+            .get('/breeds/1')
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200, done);
+    });
 
-
-
-
+    it('respond with 404 not found - invalid breed id', function (done) {
+        request(app)
+            .get('/breeds/9')
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(404, "breed id '9' not found in database", done);
+    });
+})
