@@ -1,13 +1,14 @@
 // class 'CatClass' serves as a template for creating new cat objects with props & methods
 // example of dependancy injection:
 
-
 class CatClass {
     constructor(idGenerator) { // to generate a new class: const newCatRepo = new CatRepository() < pass idGenerator in as an argument 
-        this.generateId = idGenerator;
+        console.log("idGenerator passed in: " + idGenerator);
+        this.generateId = idGenerator; 
+        console.log("this.generateId: " + this.generateId);
         this.cats = [
             {   
-                id: this.generateId(),
+                id: this.generateId(),  // TypeError: this.generateId is not a function
                 name: "Catty",
                 ageInYears: 1,
                 favouriteToy: "grass",
@@ -132,8 +133,3 @@ module.exports.catClass = CatClass
 // Note that if a module is imported multiple times, but with the same specifier (i.e. path), 
 // the JavaScript specification guarantees that you’ll receive the same module instance. 
 // Above, we should expect that although the class instance is imported in app.js AND catsRouter, it will be the same instance. 
-
-// (and is that instance changeable and the changes stored?)
-// or should I import it into app.js and then re-export into catsRouter as something else? 
-// let's try it! 
-
