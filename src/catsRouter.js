@@ -6,50 +6,59 @@ class CatsRouterClass {
         this.catsRouter = this.express.Router();         // creates instance of Express router
         this.catRepository = catRepository;
 
-        this.isIdValid = this.isIdValid.bind(this); // Note that methods that contain neighbouring method calls require binding to the class
+        this.isIdValid = this.isIdValid.bind(this);     
         this.checkObjValues = this.checkObjValues.bind(this); 
     }
+    // Note that methods that contain neighbouring method calls require binding to the class
     
     isInvalidString (value) {
         return typeof value !== "string"                                  
     }
     
-    isInvalidNum (value) {   // 
+    isInvalidNum (value) {  
     return typeof(value) !== "number";                              
     }
     
-    generateErr (key, value) {
-        let message =  `Invalid ${key} parameter: "${value}"`;
+    // 400 - BAD REQUEST
+    generateErr400 (message) { 
         const newError = new Error(message);
-        newError.status = 400;
+        newError.status = 400; 
+        return newError; 
+    } 
+
+    // 404 - NOT FOUND
+    generateErr404 (id) {
+        let message = `cat id '${id}' not found in database`
+        const newError = new Error(message);
+        newError.status = 404; 
         return newError; 
     }
     
     // checks if id is a valid shortid                          
-    isIdValid (req, res, next) {       
-        console.log('id being verified');
+    isIdValid (req, res, next) {  
 
-        if (this.shortid.isValid(req.params.id)) {   
-            req.id = req.params.id;                                             
-            console.log('id verified');
+        let id = req.params.id; 
+        console.log(`id '${id}'' being verified`);
+        
+        if (this.shortid.isValid(id)) {   
+            req.id = id;                                             
+            console.log('id verified as valid shortid');
             next() 
         } else {
-            const newError =  new Error(`'${req.params.id}' is not a valid shortid`)
-            newError.status = 400;
-            next(newError); 
+            const err = this.generateErr400(`'${id}' is not a valid shortid`);
+            next(err); 
         };
     }
 
     // checks object data format
     checkObjFormat (req, res, next) { 
-        const objectConstructor = ({}).constructor; // in strict mode, 'this' in functions is undefined. 
-        if (req.body.constructor === objectConstructor) { // within methods, 'this' refers to the object the method is owned by. 
-            console.log("verified request data is an object") // this does not apply to nested functions, where you declare a function within an object's method
+        const objectConstructor = ({}).constructor;  
+        if (req.body.constructor === objectConstructor) {  
+            console.log("verified request data is an object");
             next();
         } else {
-            const newError = new Error ('Request data is not an object - check format');
-            newError.status = 400;
-            return next(newError);
+            const err = this.generateErr400('Request data is not an object - check format');
+            next(err); 
         }
     }
 
@@ -90,80 +99,73 @@ class CatsRouterClass {
 
     // checks object values 
     checkObjValues (req, res, next) { 
-        const objToCheck = req.body;      // { name: "", ageInYears: "", favouriteToy: ""}
+        const object = req.body;      // Eg: { name: "", ageInYears: "", favouriteToy: ""}
         
-        for (let key in objToCheck) {
-            if (key === "ageInYears") {
-                if (this.isInvalidNum(objToCheck.ageInYears)) {  // if the age is an invalid Number 
-                    console.log(`we have encountered invalid number: ${objToCheck[key]}`);
-                    return next(this.generateErr(key, objToCheck[key])); 
-                } 
-            } else {
-                const b = this.isInvalidString(objToCheck[key])
-                if (b) {  // it has an issue 
-                    console.log(`we have encountered invalid ${key} value: ${objToCheck[key]}`);
-                    return next(this.generateErr(objToCheck[key]));
-                } 
-            };
+        for (let key in object) {
+            let value  = object[key];
+
+            let invalidParam = (key === "ageInYears") ? this.isInvalidNum(value) : this.isInvalidString(value); 
+            if (invalidParam) {
+                const err = this.generateErr400(`Invalid ${key} parameter: "${value}"`);
+                next(err); 
+            }  // refactored to reduce repetition of generateErr() function calls 
         }
-        
-        req.object = objToCheck;            
+
+        req.object = object;            
         console.log('object values checked');     
         next();
     }
     
     initializeRoutes () {
+
         // GET route all 
-        this.catsRouter.get('/', (req, res, next) => {   // In arrow functions this. contetxt uses the enclosing parent context
+        this.catsRouter.get('/', (req, res, next) => {  
             const cats = this.catRepository.getAllCats();  
             res.json({"cats": cats}); 
         });
 
         // GET route by id 
         this.catsRouter.get('/:id', this.isIdValid, (req, res, next) => {  
-            const foundCat = this.catRepository.getCatById(req.id); 
-            if (foundCat) {
+            // getCatById returns cat object or null 
+            const foundCat = this.catRepository.getCatById(req.id);         
+            if (foundCat) { 
                 console.log('cat retrieved:' + foundCat);
                 res.send(foundCat);
             } else {
-                const newError =  new Error(`cat id '${req.id}' not found in database`)
-                newError.status = 404;
-                return next(newError)
-            };
+                return next(this.generateErr404(req.id))
+            }
         });
 
         // POST route 
-        this.catsRouter.post('/', this.checkObjFormat, this.checkObjKeys, this.checkObjValues, (req, res, next) => {  // all callbacks work! 
-            const catWithId = this.catRepository.addCat(req.object); // this. is within a callback function of a method call on the object catsRouter 
+        this.catsRouter.post('/', this.checkObjFormat, this.checkObjKeys, this.checkObjValues, (req, res, next) => {   // TODO: we can combine 3 x checks into one for simplicity
+            const catWithId = this.catRepository.addCat(req.object); 
             res.status(201).send(catWithId);  
         });
 
         // PUT route - allows user to add/update information by id
         this.catsRouter.put('/:id', this.isIdValid, this.checkObjFormat, this.checkObjKeys, this.checkObjValues, (req, res, next) => {
-            const isUpdated = this.catRepository.updateCatById(req.id, req.object);             // [ {}, {}, {} ]
+            // updateCatById returns updated cat object or null 
+            const isUpdated = this.catRepository.updateCatById(req.id, req.object);            
             if (isUpdated) {
                 console.log(`cat id '${req.id}' successfully updated`)
-                res.send(isUpdated); // may need to use: res.send(JSON.stringify(updatedCat)); 
+                res.send(isUpdated); 
             } else {
-                const newError = new Error(`cat id '${req.id}' not found in database`);
-                newError.status = 404; 
-                next(newError); 
+                return next(this.generateErr404(req.id))
             }
         });
 
         // DEL route
         this.catsRouter.delete('/:id', this.isIdValid, (req, res, next) => {
+            // updateCatById returns updated cat object or null 
             const isDeleted = this.catRepository.deleteCatById(req.id); 
             if (isDeleted) {
-                res.status(204).send();
+                res.status(204).send(); // 204 NO CONTENT 
             } else {
-                const newError =  new Error(`cat id '${req.id}' not found in database`)
-                newError.status = 404;
-                return next(newError)
+                return next(this.generateErr404(req.id))
             }
         });
     }
-}
+} 
 
 module.exports.router = CatsRouterClass; 
 // export a class by attaching it as a property of the module.exports object 
