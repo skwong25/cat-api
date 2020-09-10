@@ -193,7 +193,7 @@ describe('GET /breeds', function () {
     it('respond with json object containing a list of all breeds', function (done) {
         request(appTest)
             .get('/breeds')
-            .set('Accept', 'appTestlication/json')
+            .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200, done);
     });
@@ -203,7 +203,7 @@ describe('GET /breeds/:breedId', function () {
     it('respond with json object containing information on a single breed', function (done) {
         request(appTest)
             .get('/breeds/1')
-            .set('Accept', 'appTestlication/json')
+            .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200, done);
     });
