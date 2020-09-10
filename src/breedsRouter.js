@@ -3,8 +3,8 @@
 const express = require('express');  
 const breedsRouter = express.Router();
 
-const breedRepository = require('./breedsDb.js');
-
+// imports class instance 
+const breedRepository = require('./breedsRepo'); 
 
 const isInvalidString = (value) => {
     return typeof value !== "string"                                  
