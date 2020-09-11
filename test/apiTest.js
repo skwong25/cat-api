@@ -106,7 +106,7 @@ describe('PUT /cats/:id', function () {
             .send(falseBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400, `Invalid ageInYears parameter: "two"`, done)
+            .expect(400, `Error: Invalid ageInYears parameter: "two"`, done)
     });  
 })
 //  Error: expected 400 "Bad Request", got 500 "Internal Server Error"
@@ -148,6 +148,9 @@ describe('POST /cats', function () {
         "favouriteToy": "amazing technicolour dream"
     }
 
+    const empty = {
+
+    }
     
     it('respond with 201 content created - responds with newly-created cat object with generated id property', function (done) {
         request(appTest)
@@ -166,28 +169,36 @@ describe('POST /cats', function () {
             .expect(201, done)                                              
     })
 
-    it('respond with 400 - invalid key', function (done) {
+    it('respond with 400 invalid key', function (done) {
         request(appTest)
             .post('/cats')
             .send(invalidKey)
             .expect(400)
-            .expect(`Property 'ears' is invalid`)
+            .expect(`Error: Property 'ears' is invalid`)
             .end((err) => {
                 if (err) return done(err); 
                 done();                     
             });
     }) 
 
-    it('respond with 400 invalid parameter`', function (done) {
+    it('respond with 400 invalid parameter', function (done) {
         request(appTest)
             .post('/cats')
             .send(invalidParams)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400,'Invalid ageInYears parameter: "five"', done)
+            .expect(400,'Error: Invalid ageInYears parameter: "five"', done)
+    }) 
+
+    it('respond with 400 invalid object', function (done) {
+        request(appTest)
+            .post('/cats')
+            .send(empty)
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(400,'Error: Request data is not a valid object. ', done)
     }) 
 })
-// Error: expected 400 "Bad Request", got 500 "Internal Server Error"
 
 describe('GET /breeds', function () {
     it('respond with json object containing a list of all breeds', function (done) {

@@ -8,34 +8,68 @@ class CatsRouterClass {
 
         this.isIdValid = this.isIdValid.bind(this);     
         this.checkObjValues = this.checkObjValues.bind(this); 
+        this.checkObject = this.checkObject.bind(this); 
     }
     // Note that methods that contain neighbouring method calls require binding to the class
     
-    isInvalidString (value) {
+    // SIMPLE JS FUNCTIONS: 
+    isInvalidString(value) {
         return typeof value !== "string"                                  
     }
     
-    isInvalidNum (value) {  
-    return typeof(value) !== "number";                              
+    isInvalidNum(value) {  
+    return typeof(value) !== "number";  
     }
     
     // 400 - BAD REQUEST
-    generateErr400 (message) { 
+    generateErr400(message) { 
         const newError = new Error(message);
         newError.status = 400; 
         return newError; 
     } 
 
     // 404 - NOT FOUND
-    generateErr404 (id) {
+    generateErr404(id) {
         let message = `cat id '${id}' not found in database`
         const newError = new Error(message);
         newError.status = 404; 
         return newError; 
     }
-    
+
+    // checks for a populated object 
+    checkObjFormat(keys) {
+        let message = (keys.length !== 0) ? 
+            'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
+        return message; 
+    } 
+
+    // checks for valid keys 
+    checkObjKeys(keys) {
+        const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
+        let invalidKeys = keys.filter(key => { 
+            return !validKeys.includes(key)
+        })
+        let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
+        return message;  
+    }
+
+    // checks for valid property values  
+    checkObjValues (keys, object) {  
+        let isError = [];
+        keys.forEach((key) => {
+            let value = object[key]; 
+            let invalidParam = (key === "ageInYears") ? this.isInvalidNum(value) : this.isInvalidString(value);
+            if (invalidParam === true) {  
+                isError.push(`Error: Invalid ${key} parameter: "${value}"`)
+            }  
+        })      
+        let message = isError[0] || 'Check successful - object property values valid';
+        return message; 
+    }
+
+    // MIDDLEWARE FUNCTIONS: 
     // checks if id is a valid shortid                          
-    isIdValid (req, res, next) {  
+    isIdValid(req, res, next) {  
 
         let id = req.params.id; 
         console.log(`id '${id}'' being verified`);
@@ -50,70 +84,25 @@ class CatsRouterClass {
         };
     }
 
-    // checks object data format
-    checkObjFormat (req, res, next) { 
-        const objectConstructor = ({}).constructor;  
-        if (req.body.constructor === objectConstructor) {  
-            console.log("verified request data is an object");
-            next();
-        } else {
-            const err = this.generateErr400('Request data is not an object - check format');
-            next(err); 
-        }
-    }
+    // consolidates Object checks 
+    checkObject(req, res, next) { 
 
-    // checks object keys  
-    checkObjKeys (req, res, next) {  
-        
-        const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
-        
-        function keyNotPresent (key) { 
-            console.log(`is ${key} present?`)
-            return !validKeys.includes(key) // returns true if key is NOT one of the possibleKeys
-        }
-        
-        const objToCheck = req.body;                
-        console.log("Checking object: " + objToCheck);
-        const arrayOfKeys = Object.keys(objToCheck);      
-        console.log("The keys to check: " + arrayOfKeys);
-        
-        if (arrayOfKeys.length < 1) {
-            const newError = new Error('no parameters provided');
-            newError.status = 404;
-            return next(newError);
-        }
-        
-        let invalidKey = arrayOfKeys.filter(keyNotPresent); // returns an array of elements that meet the criteria 
-        
-        if (invalidKey[0]) { 
-            console.log(`Property '${invalidKey[0]}' is invalid`);
-            const newError = new Error(`Property '${invalidKey[0]}' is invalid`);
-            newError.status = 400;
-            return next(newError);
-        } else {
-            console.log('object keys checked'); 
-            req.object = objToCheck; 
-            next();
-        }
-    } // FIXME this seems convoluted just to check if an object key is valid 
+        const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
+        const keys = Object.keys(object);
+        let arrayOfFunctions = [this.checkObjFormat, this.checkObjKeys, this.checkObjValues];
 
-    // checks object values 
-    checkObjValues (req, res, next) { 
-        const object = req.body;      // Eg: { name: "", ageInYears: "", favouriteToy: ""}
-        
-        for (let key in object) {
-            let value  = object[key];
+        arrayOfFunctions.forEach((funct) => { 
+            let message = funct(keys, object);
 
-            let invalidParam = (key === "ageInYears") ? this.isInvalidNum(value) : this.isInvalidString(value); 
-            if (invalidParam) {
-                const err = this.generateErr400(`Invalid ${key} parameter: "${value}"`);
-                next(err); 
-            }  // refactored to reduce repetition of generateErr() function calls 
-        }
+            if (message[0] === "E") {
+                next(this.generateErr400(message))
+            } else {
+                console.log(message);
+            };
+        });
 
-        req.object = object;            
-        console.log('object values checked');     
-        next();
+    req.object = object;         
+    next()
     }
     
     initializeRoutes () {
@@ -137,13 +126,13 @@ class CatsRouterClass {
         });
 
         // POST route 
-        this.catsRouter.post('/', this.checkObjFormat, this.checkObjKeys, this.checkObjValues, (req, res, next) => {   // TODO: we can combine 3 x checks into one for simplicity
+        this.catsRouter.post('/', this.checkObject, (req, res, next) => {   
             const catWithId = this.catRepository.addCat(req.object); 
             res.status(201).send(catWithId);  
         });
 
         // PUT route - allows user to add/update information by id
-        this.catsRouter.put('/:id', this.isIdValid, this.checkObjFormat, this.checkObjKeys, this.checkObjValues, (req, res, next) => {
+        this.catsRouter.put('/:id', this.isIdValid, this.checkObject, (req, res, next) => {
             // updateCatById returns updated cat object or null 
             const isUpdated = this.catRepository.updateCatById(req.id, req.object);            
             if (isUpdated) {
