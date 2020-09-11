@@ -54,7 +54,7 @@ class CatsRouterClass {
     }
 
     // checks for valid property values  
-    checkObjValues (keys, object) {  
+    checkObjValues(keys, object) {  
         let isError = [];
         keys.forEach((key) => {
             let value = object[key]; 
@@ -85,6 +85,7 @@ class CatsRouterClass {
     }
 
     // consolidates Object checks 
+    // Each check function returns a message - messages prepended with "Error.." are passed onto generate error. 
     checkObject(req, res, next) { 
 
         const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
@@ -105,7 +106,7 @@ class CatsRouterClass {
     next()
     }
     
-    initializeRoutes () {
+    initializeRoutes() {
 
         // GET route all 
         this.catsRouter.get('/', (req, res, next) => {  

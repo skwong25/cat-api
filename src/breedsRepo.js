@@ -30,7 +30,7 @@ class BreedRepository {
         return foundBreed;  // foundBreed is either -1 or a valid index
     }
 
-    getBreedById (id) {
+    getBreedById(id) {
         const breedsCopy = this.getAllBreeds; 
         const idMatchArray = breedsCopy.filter((breed) => {  // could use findIndexById instead of array.filter
             return breed['breedId'] == id; 
@@ -38,7 +38,7 @@ class BreedRepository {
         return idMatchArray[0];
     }
 
-    updateBreedById (id, object) {
+    updateBreedById(id, object) {
         const breedsCopy = this.getAllBreeds; 
         const index = this.findIndexById(id); // 
         if (index === -1) {
@@ -56,7 +56,7 @@ class BreedRepository {
         };       
     }
 
-    addBreed (newBreed) { 
+    addBreed(newBreed) { 
         const breedsCopy = this.getAllBreeds;
         const newIndex = breedsCopy.length + 1
         newBreed.breedId = newIndex;
@@ -65,7 +65,7 @@ class BreedRepository {
         return newBreed; 
     }
 
-    deleteBreedById (id) {
+    deleteBreedById(id) {
         const breedsCopy = this.getAllBreeds;  // first, find the index. Then splice it by index. 
         if (foundBreed !== -1) {
             breedsCopy.splice(foundBreed, 1);

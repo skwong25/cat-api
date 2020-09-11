@@ -76,7 +76,7 @@ breedsRouter.get('/', (req, res, next) => {
 breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {
     const foundBreed = breedRepository.getBreedById(req.breedId);  
     if (foundBreed) {  
-        res.send(foundBreed); // TODO - in the test, can we expect this to be an object? 
+        res.send(foundBreed); 
     } else {
         const newError = new Error(`breed id '${req.breedId}' not found in database`);
         newError.status = 404;

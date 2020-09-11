@@ -51,7 +51,7 @@ class CatRepositoryClass {
     }
 
     // returns summary object of each cat. 
-    getAllCats () {
+    getAllCats() {
         const catCopy = this.getCats;  
         console.log("Copied cat array from database"); 
         const summaryArray = catCopy.map((object) => {
@@ -66,7 +66,7 @@ class CatRepositoryClass {
 
     // updates database with new cat record 
     // assigns id, adds cat to copy of existing array, reassigns to class object 
-    addCat (newCat) {
+    addCat(newCat) {
         newCat.id = this.generateId();            
         let catsCopy = this.getCats;         
         catsCopy.push(newCat);             
@@ -75,7 +75,7 @@ class CatRepositoryClass {
     } 
     
     // checks database for cat id match, returns index or -1  
-    getIndexById (id) { 
+    getIndexById(id) { 
         const catArray = this.getCats;       
         return catArray.findIndex(cat => {       
             return cat.id == id;                         
@@ -83,7 +83,7 @@ class CatRepositoryClass {
     } 
 
     // returns cat object or null 
-    getCatById (id) {
+    getCatById(id) {
         const foundIndex = this.getIndexById(id);
         if (foundIndex === -1) {
             return null;
@@ -93,7 +93,7 @@ class CatRepositoryClass {
     }
 
     // returns updated cat object or null 
-    updateCatById (id, catUpdateObj) {
+    updateCatById(id, catUpdateObj) {
         const foundIndex = this.getIndexById(id); 
         if (foundIndex === -1) {
             return null;
@@ -111,7 +111,7 @@ class CatRepositoryClass {
     }
 
     // returns deleted cat object or null 
-    deleteCatById (id) {
+    deleteCatById(id) {
         const foundIndex = this.getIndexById(id);
         if (foundIndex === -1) {
             return null;

@@ -5,7 +5,7 @@ const should = require('should');
 
 const buildServer = require('../src/app'); 
 const generateTestId = {
-    generate () {
+    generate() {
         return "tmk60ux2b" 
 
     } 
