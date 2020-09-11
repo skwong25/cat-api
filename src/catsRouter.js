@@ -3,69 +3,15 @@ class CatsRouterClass {
     constructor(catRepository) {
         this.express = require('express');  
         this.shortid = require('shortid');
+        this.validate = require('./validationFunctions'); 
         this.catsRouter = this.express.Router();         // creates instance of Express router
         this.catRepository = catRepository;
 
         this.isIdValid = this.isIdValid.bind(this);     
-        this.checkObjValues = this.checkObjValues.bind(this); 
+        // this.checkObjValues = this.checkObjValues.bind(this);  
         this.checkObject = this.checkObject.bind(this); 
     }
     // Note that methods that contain neighbouring method calls require binding to the class
-    
-    // SIMPLE JS FUNCTIONS: 
-    isInvalidString(value) {
-        return typeof value !== "string"                                  
-    }
-    
-    isInvalidNum(value) {  
-    return typeof(value) !== "number";  
-    }
-    
-    // 400 - BAD REQUEST
-    generateErr400(message) { 
-        const newError = new Error(message);
-        newError.status = 400; 
-        return newError; 
-    } 
-
-    // 404 - NOT FOUND
-    generateErr404(id) {
-        let message = `cat id '${id}' not found in database`
-        const newError = new Error(message);
-        newError.status = 404; 
-        return newError; 
-    }
-
-    // checks for a populated object 
-    checkObjFormat(keys) {
-        let message = (keys.length !== 0) ? 
-            'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
-        return message; 
-    } 
-
-    // checks for valid keys 
-    checkObjKeys(keys) {
-        const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
-        let invalidKeys = keys.filter(key => { 
-            return !validKeys.includes(key)
-        })
-        let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
-        return message;  
-    }
-
-    // checks for valid property values  
-    checkObjValues(keys, object) {  
-        let isError = [];
-        keys.forEach((key) => {
-            let value = object[key]; 
-            let invalidParam = (key === "ageInYears") ? this.isInvalidNum(value) : this.isInvalidString(value);
-            if (invalidParam === true) {  
-                isError.push(`Error: Invalid ${key} parameter: "${value}"`)
-            }  
-        })      
-        let message = isError[0] || 'Check successful - object property values valid';
-        return message; 
-    }
 
     // MIDDLEWARE FUNCTIONS: 
     // checks if id is a valid shortid                          
@@ -79,7 +25,7 @@ class CatsRouterClass {
             console.log('id verified as valid shortid');
             next() 
         } else {
-            const err = this.generateErr400(`'${id}' is not a valid shortid`);
+            const err = this.validate.generateErr400(`'${id}' is not a valid shortid`);
             next(err); 
         };
     }
@@ -90,13 +36,13 @@ class CatsRouterClass {
 
         const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
         const keys = Object.keys(object);
-        let arrayOfFunctions = [this.checkObjFormat, this.checkObjKeys, this.checkObjValues];
+        let arrayOfFunctions = [this.validate.checkObjFormat, this.validate.checkObjKeys, this.validate.checkObjValues];
 
         arrayOfFunctions.forEach((funct) => { 
             let message = funct(keys, object);
 
             if (message[0] === "E") {
-                next(this.generateErr400(message))
+                next(this.validate.generateErr400(message))
             } else {
                 console.log(message);
             };
@@ -122,7 +68,7 @@ class CatsRouterClass {
                 console.log('cat retrieved:' + foundCat);
                 res.send(foundCat);
             } else {
-                return next(this.generateErr404(req.id))
+                return next(this.validate.generateErr404(req.id))
             }
         });
 
@@ -140,7 +86,7 @@ class CatsRouterClass {
                 console.log(`cat id '${req.id}' successfully updated`)
                 res.send(isUpdated); 
             } else {
-                return next(this.generateErr404(req.id))
+                return next(this.validate.generateErr404(req.id))
             }
         });
 
@@ -151,7 +97,7 @@ class CatsRouterClass {
             if (isDeleted) {
                 res.status(204).send(); // 204 NO CONTENT 
             } else {
-                return next(this.generateErr404(req.id))
+                return next(this.validate.generateErr404(req.id))
             }
         });
     }
