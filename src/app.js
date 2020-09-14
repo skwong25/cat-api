@@ -1,46 +1,63 @@
 // CAT API
 
-const express = require('express');         // imports express lib module
-const app = express();                     // express() instantiates app 
-const morgan = require('morgan');
-const bodyParser = require('body-parser')
+// QUESTION: Am I confused re. repositories?
 
-app.use(express.json());        
-app.use(bodyParser.json())      // automatically attaches parsed JSON object to req.body - should send data as raw in Postman
+const buildServer = (idGenerator) => {
 
-const catsRouter = require('./catsRouter.js');
-const breedsRouter = require('./breedsRouter.js');
+    // imports express lib module
+    // express() instantiates app 
+    const express = require('express');        
+    const app = express();      
+    
+    // helper node modules
+    const morgan = require('morgan');                               
+    const bodyParser = require('body-parser');
 
-app.use('/cats', catsRouter);
-app.use('/breeds', breedsRouter);
+    app.use(express.json());        
+    app.use(bodyParser.json())    
+    // Note that bodyParser attaches parsed JSON object to req.body                              
 
-const PORT = 4001;
+    // imports & class instantiation of repositories and routers
+    // note module.exports = {repository: CatRepositoryClass}
+    const breedsRouter = require('./breedsRouter');
 
-app.use(morgan('tiny'));
+    const importObject = require('./catsRepo'); 
+    const CatRepositoryClass = importObject.repository; 
+    const catRepository = new CatRepositoryClass(idGenerator.generate); 
 
-// error-handling sends back error responses 
-app.use((err, req, res, next) => {
-    let status = err.status || 500  
-    let message = err.message || 'test message'
-    res.status(status).send(message); 
-});
+    const importRouterObject = require('./catsRouter');      
+    const CatsRouterClass = importRouterObject.router;
+    const catsRouter = new CatsRouterClass(catRepository); 
 
-// sets server up (listening for reqs)
-app.listen(PORT, () => { 
-    console.log(`the server is listening for catcalls on port ${PORT}`)
-});
-module.exports = app
+    catsRouter.initializeRoutes(); // calls the routes 
 
+    app.use('/cats', catsRouter.catsRouter);  // TypeError: Router.use() requires a middleware function but got a Object 
+    app.use('/breeds', breedsRouter);
 
+    const PORT = 4001;
 
+    app.use(morgan('tiny'));
 
-// EXTRAS:
-// separate cats by breed or location, try a nested router? 
-// error handlers - not currently required 
-// do we need to use body-parser? NO - when do we need to use this? 
-// checks that can also be controlled in the UI:
-// breedId is a number 
-// coat is specific type
+    // error-handling sends back error responses 
+    app.use((err, req, res, next) => {
+        let status = err.status || 500  
+        let message = err.message || 'test message'
+        res.status(status).send(message); 
+    });
+
+    // sets server up (listening for reqs)
+    app.listen(PORT, () => { 
+        console.log(`the server is listening for catcalls on port ${PORT}`)
+    });
+
+    return app; 
+}
+
+module.exports = buildServer;  
+
+// we don't want it to export value of the function call because this does not allow us to swap generateId out for a mock.
+//  Maybe another file imports buildServer and calls buildServer(generateId); 
+
 
 // How do we verify that request data in PUT/POST requests is a JSON object?
 // The bodyparser recognises JSON and parse it into an object attached to req.body 
