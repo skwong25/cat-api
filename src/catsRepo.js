@@ -1,7 +1,7 @@
 // class 'CatRepositoryClass' serves as a template for creating new cat objects with props & methods
 // example of dependancy injection:
 
-class CatRepositoryClass {
+class CatRepository {
     constructor(idGenerator) { 
         console.log("idGenerator passed in: " + idGenerator);
         this.generateId = idGenerator; 
@@ -124,7 +124,7 @@ class CatRepositoryClass {
     }
 } 
 
-module.exports.repository = CatRepositoryClass
+module.exports.repository = CatRepository
 // export a class by attaching it as a property of the module.exports object 
 
 

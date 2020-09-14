@@ -46,13 +46,13 @@ describe('GET /cats/:id', function () {
 
 
 describe('GET /cats/:id', function () {
-    it('respond with 404 cat id not found - passes the validId check', function (done) {
+    it('respond with 404 id not found - passes the validId check', function (done) {
         request(appTest)
             .get('/cats/oc12C0X3-g')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8") 
             .expect(404) 
-            .expect(`cat id 'oc12C0X3-g' not found in database`) 
+            .expect(`id 'oc12C0X3-g' not found in database`) 
             .end((err) => {
                 if (err) return done(err); 
                 done();                    
@@ -118,12 +118,12 @@ describe('DEL /cats/:id', function () {
             .expect(204, done)
     });
 
-    it('respond with 404 cat id not found', function (done) {
+    it('respond with 404 id not found', function (done) {
         request(appTest)
             .delete('/cats/oc12C0X3-g')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(`cat id 'oc12C0X3-g' not found in database`) 
+            .expect(`id 'oc12C0X3-g' not found in database`) 
             .expect(404, done)
     });
 });
@@ -219,11 +219,11 @@ describe('GET /breeds/:breedId', function () {
             .expect(200, done);
     });
 
-    it('respond with 404 not found - invalid breed id', function (done) {
+    it('respond with 404 not found - invalid id', function (done) {
         request(appTest)
             .get('/breeds/9')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, "breed id '9' not found in database", done);
+            .expect(404, "id '9' not found in database", done);
     });
 })
