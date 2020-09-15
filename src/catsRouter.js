@@ -1,10 +1,10 @@
 
-class CatsRouterClass {
+class CatsRouter {
     constructor(catRepository) {
         this.express = require('express');  
         this.shortid = require('shortid');
-        this.validate = require('./validationFunctions'); 
-        this.catsRouter = this.express.Router();         // creates instance of Express router
+        this.validate = require('./validationFunctions');       
+        this.catsRouter = this.express.Router();                // creates instance of Express router
         this.catRepository = catRepository;
 
         this.isIdValid = this.isIdValid.bind(this);     
@@ -25,8 +25,7 @@ class CatsRouterClass {
             console.log('id verified as valid shortid');
             next() 
         } else {
-            const err = this.validate.generateErr400(`'${id}' is not a valid shortid`);
-            next(err); 
+            return next(this.validate.generateErr400(`'${id}' is not a valid shortid`));
         };
     }
 
@@ -42,7 +41,8 @@ class CatsRouterClass {
             let message = funct(keys, object);
 
             if (message[0] === "E") {
-                next(this.validate.generateErr400(message))
+                const err = this.validate.generateErr400(message);
+                return next(err);
             } else {
                 console.log(message);
             };
@@ -103,5 +103,5 @@ class CatsRouterClass {
     }
 } 
 
-module.exports.router = CatsRouterClass; 
+module.exports.router = CatsRouter; 
 // export a class by attaching it as a property of the module.exports object 

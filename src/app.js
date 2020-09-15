@@ -18,16 +18,16 @@ const buildServer = (idGenerator) => {
     // Note that bodyParser attaches parsed JSON object to req.body                              
 
     // imports & class instantiation of repositories and routers
-    // note module.exports = {repository: CatRepositoryClass}
+    // note module.exports = {repository: CatRepository}
     const breedsRouter = require('./breedsRouter');
 
     const importObject = require('./catsRepo'); 
-    const CatRepositoryClass = importObject.repository; 
-    const catRepository = new CatRepositoryClass(idGenerator.generate); 
+    const CatRepository = importObject.repository; 
+    const catRepository = new CatRepository(idGenerator.generate); 
 
     const importRouterObject = require('./catsRouter');      
-    const CatsRouterClass = importRouterObject.router;
-    const catsRouter = new CatsRouterClass(catRepository); 
+    const CatsRouter = importRouterObject.router;
+    const catsRouter = new CatsRouter(catRepository); 
 
     catsRouter.initializeRoutes(); // calls the routes 
 
