@@ -10,10 +10,12 @@ const generateTestId = {
 
     } 
 }
-    
+
 const appTest = buildServer(generateTestId);
 
 //==================== user API tests ====================
+
+// afterAll( async (done) => { await server.destroy(); done(); });
 
 
 describe('GET /cats', function () {
@@ -30,7 +32,11 @@ describe('GET /cats', function () {
                 res.body.cats[0].should.have.property('id');
                 res.body.cats[0].should.have.property('name','Catty'); // YET THIS WORKS 
             })
-            .expect(200, done);
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     });
 });
 
@@ -40,7 +46,11 @@ describe('GET /cats/:id', function () {
             .get('/cats/tmk60ux2b')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
-            .expect(200, done);
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     });
 });
 
@@ -97,7 +107,11 @@ describe('PUT /cats/:id', function () {
             .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', /json/)  
-            .expect(200, done)
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     }); 
 
     it('responds with 400 bad request - age is incorrect format', function (done) {
@@ -106,16 +120,23 @@ describe('PUT /cats/:id', function () {
             .send(falseBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400, `Error: Invalid ageInYears parameter: "two"`, done)
+            .expect(400, `Error: Invalid ageInYears parameter: "two"`)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     });  
 })
-//  Error: expected 400 "Bad Request", got 500 "Internal Server Error"
 
 describe('DEL /cats/:id', function () {
     it('respond with 204 No Content', function (done) {
         request(appTest)
             .delete('/cats/tmk60ux2b')
-            .expect(204, done)
+            .expect(204)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     });
 
     it('respond with 404 id not found', function (done) {
@@ -124,7 +145,11 @@ describe('DEL /cats/:id', function () {
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
             .expect(`id 'oc12C0X3-g' not found in database`) 
-            .expect(404, done)
+            .expect(404)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
     });
 });
 
@@ -166,7 +191,11 @@ describe('POST /cats', function () {
                 res.body.favouriteToy.should.equal('amazing technicolour dreamcoat');
                 res.body.should.have.property('id');
             })
-            .expect(201, done)                                              
+            .expect(201)   
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })                                              
     })
 
     it('respond with 400 invalid key', function (done) {
@@ -187,8 +216,12 @@ describe('POST /cats', function () {
             .send(invalidParams)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400,'Error: Invalid ageInYears parameter: "five"', done)
-    }) 
+            .expect(400,'Error: Invalid ageInYears parameter: "five"')
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+        }) 
+    })
 
     it('respond with 400 invalid object', function (done) {
         request(appTest)
@@ -196,6 +229,22 @@ describe('POST /cats', function () {
             .send(empty)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400,'Error: Request data is not a valid object. ', done)
-    }) 
+            .expect(400,'Error: Request data is not a valid object. ')
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })           
+    })
 })
+  
+// afterAll(done => {
+//     done()
+// })
+
+/*
+afterAll(() => {
+    mongoose.connection.close();
+    server.close();
+  });
+*/
+

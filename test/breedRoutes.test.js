@@ -34,11 +34,16 @@ describe('GET /breeds/:breedId', function () {
             .expect(200, done);
     });
 
+describe('GET /breeds/:breedId', function () {
     it('respond with 404 not found - invalid breed id', function (done) {
         request(appTest)
             .get('/breeds/9')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, "breed id '9' not found in database", done);
+            .expect(404, "id '9' not found in database")
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })
     });
 })

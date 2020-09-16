@@ -46,14 +46,14 @@ const buildServer = (idGenerator) => {
     });
 
     // sets server up (listening for reqs)
-    app.listen(PORT, () => { 
+    const server = app.listen(PORT, () => { 
         console.log(`the server is listening for catcalls on port ${PORT}`)
     });
 
     return app; 
 }
 
-module.exports = buildServer;  
+module.exports = buildServer;   // I can expot as 2 diff things. 
 
 // we don't want it to export value of the function call because this does not allow us to swap generateId out for a mock.
 //  Maybe another file imports buildServer and calls buildServer(generateId); 
