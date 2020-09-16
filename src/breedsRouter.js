@@ -69,7 +69,7 @@ breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {
 // DEL breed by id 
 breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
     const isItDeleted = breedRepository.deleteBreedById(req.breedId); 
-    if (isItDeleted) {              // deleteBreedById should return a truth or if it can't find the id, returns false 
+    if (isItDeleted) {               
         res.status(204).send();
     } else {
         const err = validate.generateErr404(req.breedId);
@@ -79,7 +79,7 @@ breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
 
 // PUT breed by id 
 breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
-    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.body); // req.breedId = 1
+    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.body); 
     if (isItUpdated) {
         res.status(200).send(isItUpdated);
     } else {
@@ -89,13 +89,13 @@ breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
 })
 
 // POST breed 
-breedsRouter.post('/', checkBreedObj, (req, res, next) => { // Checks keys (of req.body) are valid data type and acceptable parameters?  
+breedsRouter.post('/', checkBreedObj, (req, res, next) => { 
     const isItUpdated = breedRepository.addBreed(req.body); 
     if (isItUpdated) {
-        console.log("new breed successfully added");
-        res.status(201).send(); // 201 is NO CONTENT 
+        console.log("new breed successfully added"); 
+        res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK
     } else { 
-        const err = validate.generateErr400('Breed could not be added to breed database');
+        const err = validate.generateErr400('Breed could not be added to breed database'); // when would this be triggered? maybe we can get rid of this err handler. 
         return next(err);
     }
 })

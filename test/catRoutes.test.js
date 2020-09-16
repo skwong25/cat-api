@@ -25,12 +25,10 @@ describe('GET /cats', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(function (res) {
-                let object = JSON.stringify(res.body); // Note that this parsing from JSON to JS object was only to be able to console log result 
-                let catOne = object.cats;          
+                let object = JSON.stringify(res.body); // Note that this parsing from JSON to JS object - only allows us to console log result 
                 console.log("object: " + object);    // {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
-                console.log("catOne: " + catOne);   // Why does catOne return as 'undefined'? How do I access the nested objects?
                 res.body.cats[0].should.have.property('id');
-                res.body.cats[0].should.have.property('name','Catty'); // YET THIS WORKS 
+                res.body.cats[0].should.have.property('name','Catty');
             })
             .expect(200)
             .end((err) => {
@@ -237,14 +235,3 @@ describe('POST /cats', function () {
     })
 })
   
-// afterAll(done => {
-//     done()
-// })
-
-/*
-afterAll(() => {
-    mongoose.connection.close();
-    server.close();
-  });
-*/
-

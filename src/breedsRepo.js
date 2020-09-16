@@ -67,6 +67,7 @@ class BreedRepository {
 
     deleteBreedById(id) {
         const breedsCopy = this.getAllBreeds;  // first, find the index. Then splice it by index. 
+        const foundBreed = this.findIndexById(id);
         if (foundBreed !== -1) {
             breedsCopy.splice(foundBreed, 1);
             this.setBreeds = breedsCopy; 
