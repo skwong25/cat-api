@@ -12,9 +12,9 @@ const checkBreedObjKeys = validate.checkBreedObjKeys;
 const checkObjValues = validate.checkObjValues; 
  
 
-describe( "checks for invalid data type", () => {
+describe("checks for invalid data type", () => {
     
-    let [ number, string ] = [ 10 , "foo" ];
+    let [number, string] = [10, "foo"];
 
     test('returns true for an invalid string', () => { 
         expect(isInvalidString(number)).toBe(true); 
@@ -31,7 +31,8 @@ describe( "checks for invalid data type", () => {
     });
 });
 
-describe( "error generator functions should return errors", () => {
+describe(
+    "error generator functions should return errors", () => {
 
     test('returns Error object with 400 status and given message', () => {
         expect(generateErr400('BAD REQUEST')).toHaveProperty("message", "BAD REQUEST");    
