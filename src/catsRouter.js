@@ -8,7 +8,6 @@ class CatsRouter {
         this.catRepository = catRepository;
 
         this.isIdValid = this.isIdValid.bind(this);     
-        // this.checkObjValues = this.checkObjValues.bind(this);  
         this.checkObject = this.checkObject.bind(this); 
     }
     // Note that methods that contain neighbouring method calls require binding to the class

@@ -13,6 +13,7 @@ const generateTestId = {
 
 const appTest = buildServer(generateTestId);
 
+
 //==================== user API tests ====================
 
 // afterAll( async (done) => { await server.destroy(); done(); });
@@ -34,7 +35,7 @@ describe('GET /cats', function () {
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
-            })    
+            })      
     });
 });
 

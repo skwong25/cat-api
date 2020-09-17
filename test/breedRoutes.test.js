@@ -15,6 +15,27 @@ const generateTestId = {
 const appTest = buildServer(generateTestId);
 
 
+//  The function passed as second argument to it() can be passed an optional callback function as its first argument. 
+// When this callback function 'done' is passed, Mocha knows that the test is for asynchronous functionality.
+// (so all of our tests below are asynchronous code!)
+// https://blog.logrocket.com/a-quick-and-complete-guide-to-mocha-testing-d0e0ea09f09d/ 
+// The done() callback must be called for Mocha to terminate the test and proceed to the next test
+// The done() callback is a Node-style callback, hence it can take an Error instance (err) as its first argument.
+// Calling the done() callback with an Error instance causes the test to fail with the given error.
+
+// Note that if we are using .end() method .expect() assertions that fail will not throw
+// they return the assertion as an error to the .end() callback. 
+// In order to fail the test case, you will need to rethrow or pass err to done()
+// lets test this by trying to fail a test where we DONT have 
+// https://github.com/visionmedia/supertest
+/*
+.end(function(err, res) {
+    if (err) return done(err);
+    done();
+  });
+*/
+
+
 //==================== user API tests ====================
 
 
@@ -25,14 +46,20 @@ describe('GET /breeds', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect((res) => {
-                res.body.breeds[0].should.have.property('breedId', 1);
-                res.body.breeds[0].should.have.property('name', 'tabby');
-                res.body.breeds[0].should.have.property('description', "Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail");
-                res.body.breeds[1].should.have.property('breedId', 2);
-                res.body.breeds[1].should.have.property('name', 'turkish angora');
-                res.body.breeds[1].should.have.property('description', 'Turkish Angoras are one of the ancient, natural breeds of cat, having originated in central Turkey dated as far back as the 17th century, in the Ankara region.');
+                let firstBreed = res.body.breeds[0];
+                let secondBreed = res.body.breeds[1];
+                firstBreed.should.have.property('breedId', 1);
+                firstBreed.should.have.property('name', 'tabby');
+                firstBreed.should.have.property('description', "Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail");
+                secondBreed.should.have.property('breedId', 2);
+                secondBreed.should.have.property('name', 'turkish angora');
+                secondBreed.should.have.property('description', 'Turkish Angoras are one of the ancient, natural breeds of cat, having originated in central Turkey dated as far back as the 17th century, in the Ankara region.');
             })
-            .expect(200, done);
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })
     });
 });
 
@@ -44,11 +71,16 @@ describe('GET /breeds/:breedId', function () {
             .expect('Content-Type', /json/)
 
             .expect((res) => {
-                res.body.should.have.property('breedId', 1);
-                res.body.should.have.property('name', 'tabby');
-                res.body.should.have.property('description');
+                let breedObject = res.body; 
+                breedObject.should.have.property('breedId', 1);
+                breedObject.should.have.property('name', 'tabby');
+                breedObject.should.have.property('description');
             })
-            .expect(200, done);
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })
     });
 
     it('respond with 404 not found - invalid breed id', function (done) {
@@ -93,11 +125,16 @@ describe('PUT /breeds/:breedId', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect((res) => {
-                res.body.should.have.property('breedId', 1);
-                res.body.should.have.property('name', 'norwegian mountain cat');
-                res.body.should.have.property('description', 'Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
+                let breedObject = res.body;
+                breedObject.should.have.property('breedId', 1);
+                breedObject.should.have.property('name', 'norwegian mountain cat');
+                breedObject.should.have.property('description', 'Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
             })
-            .expect(200, done);
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })
     });
 
     it('respond with 404 NOT FOUND - invalid id', function (done) {
@@ -161,9 +198,10 @@ describe('POST /breeds/', function () {
             .set('Accept', 'application/json')
             .expect(200)
             .expect((res) => {
-                res.body.breedId.should.equal(3);
-                res.body.name.should.equal('norwegian mountain cat');
-                res.body.description.should.equal('Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
+                let newBreed = res.body;
+                newBreed.breedId.should.equal(3);
+                newBreed.name.should.equal('norwegian mountain cat');
+                newBreed.description.should.equal('Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
             })
             .end((err) => {
                 if (err) return done(err); 

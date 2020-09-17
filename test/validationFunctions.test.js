@@ -30,17 +30,21 @@ describe("checks for invalid data type", () => {
 });
 
 describe("error generator functions should return errors", () => {
+
+// note that in http call-response, an error is not 'thrown', it is passed to error-handling middleware to be attached to the response body.
+// so there's no point in testing for a thrown error. Throwing error would terminate code execution until caught by a catch statement.
+
   
     test('returns Error object with 400 status and given message', () => {
-        expect(generateErr400('BAD REQUEST')).toHaveProperty("message", "BAD REQUEST");    
+        expect(generateErr400('BAD REQUEST')).toHaveProperty("message", "BAD REQUEST"); 
         expect(generateErr400('BAD REQUEST')).toHaveProperty("status", 400);
     });
-
+    
     test('returns Error object with 404 status and given message', () => {
         expect(generateErr404(10)).toHaveProperty("message", "id '10' not found in database");    
         expect(generateErr404(10)).toHaveProperty("status", 404);
     });
-});
+})
 
 describe("checks for valid property keys and values", () => { 
 

@@ -14,6 +14,13 @@ const breedsRouter = express.Router();
 const breedRepository = require('./breedsRepo'); 
 const validate = require('./validationFunctions'); 
 
+// imported validation functions
+const generateErr400 = validate.generateErr400; 
+const generateErr404 = validate.generateErr404; 
+const checkObjFormat = validate.checkObjFormat; 
+const checkObjKeys = validate.checkObjKeys; 
+const checkObjValues = validate.checkObjValues; 
+
 
 // checks breed id type 
 const isBreedIdNum = (req, res, next) => { 
@@ -24,7 +31,7 @@ const isBreedIdNum = (req, res, next) => {
         console.log(`breed id ${id} verified as ${typeof id}`);
         next() 
     } else {
-        const err = validate.generateErr400(`'${id}' is not a valid id`);
+        const err = generateErr400(`'${id}' is not a valid id`);
         return next(err); 
     };
 }
@@ -35,12 +42,12 @@ const checkBreedObj = (req, res, next) => {
     const keys = Object.keys(object);     // [key, key, key]
     const validKeys = ["name", "description"]; 
     
-    let arrayOfFunctions = [validate.checkObjFormat, validate.checkObjKeys, validate.checkObjValues];
+    let arrayOfFunctions = [checkObjFormat, checkObjKeys, checkObjValues];
 
     arrayOfFunctions.map((funct) => {
         let message = funct(keys, object, validKeys);
         if (message[0] === "E") {
-            const err = validate.generateErr400(message);
+            const err = generateErr400(message);
             return next(err);
         } else {
             console.log(message);  
@@ -62,7 +69,7 @@ breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {
     if (foundBreed) {  
         res.send(foundBreed); 
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     }
 })
@@ -73,7 +80,7 @@ breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
     if (isItDeleted) {               
         res.status(204).send();
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     };
 })
@@ -84,7 +91,7 @@ breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
     if (isItUpdated) {
         res.status(200).send(isItUpdated);
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     };
 })
@@ -96,7 +103,7 @@ breedsRouter.post('/', checkBreedObj, (req, res, next) => {
         console.log("new breed successfully added"); 
         res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK
     } else { 
-        const err = validate.generateErr400('Breed could not be added to breed database'); // when would this be triggered? maybe we can get rid of this err handler. 
+        const err = generateErr400('Breed could not be added to breed database');  
         return next(err);
     }
 })
