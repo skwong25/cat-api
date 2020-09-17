@@ -51,6 +51,8 @@ describe("checks for valid property keys and values", () => {
     let invalidObj = {name: "cat", description: 5}
     let validObj= {name: "cat", description: "floofy"} 
 
+    let acceptableKeys = ["name", "description"]; 
+
     it('returns an errorMessage for an empty array of keys', () => {
         expect(typeof checkObjFormat(emptyArr)).toBe("string");
         expect(checkObjFormat(emptyArr)).toEqual('Error: Request data is not a valid object. ');
@@ -58,8 +60,8 @@ describe("checks for valid property keys and values", () => {
     });
 
     it('returns an errorMessage for invalid keys', () => {
-        expect(checkObjKeys(invalidKey)).toMatch(/(error)/i);  // matches substring
-        expect(checkObjKeys(validKeys)).toMatch(/(success)/i);
+        expect(checkObjKeys(invalidKey, invalidObj, acceptableKeys)).toMatch(/(error)/i);  // matches substring
+        expect(checkObjKeys(validKeys, validObj, acceptableKeys)).toMatch(/(success)/i);
     });
 
     it('returns an errorMessage for invalid values', () => {
