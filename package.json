@@ -5,14 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/buildServer.js",
-<<<<<<< Updated upstream
-    "test": "mocha 'test/catRoutes.test.js' --exit",
-    "jest": "jest"
-=======
     "test": "npm run unit && npm run integration",
     "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
     "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit"
->>>>>>> Stashed changes
   },
   "repository": {
     "type": "git",
