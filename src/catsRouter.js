@@ -35,10 +35,11 @@ class CatsRouter {
 
         const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
         const keys = Object.keys(object);
+        const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
         let arrayOfFunctions = [this.validate.checkObjFormat, this.validate.checkObjKeys, this.validate.checkObjValues];
 
         arrayOfFunctions.forEach((funct) => { 
-            let message = funct(keys, object);
+            let message = funct(keys, object, validKeys);
 
             if (message[0] === "E") {
                 const err = this.validate.generateErr400(message);
