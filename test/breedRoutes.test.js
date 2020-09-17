@@ -39,6 +39,6 @@ describe('GET /breeds/:breedId', function () {
             .get('/breeds/9')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, "breed id '9' not found in database", done);
+            .expect(404, "id '9' not found in database", done);
     });
 })

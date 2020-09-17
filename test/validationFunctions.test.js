@@ -10,25 +10,27 @@ const checkObjFormat = validate.checkObjFormat;
 const checkObjKeys = validate.checkObjKeys; 
 const checkObjValues = validate.checkObjValues; 
  
-
-describe( "checks for invalid data type", () => {
+describe("checks for invalid data type", () => {
     
-    let [ notNumber, number ]= [ "foo", 10 ];
-    let [ notString, string ] = [ 10 , "foo" ];
+    let [number, string] = [10, "foo"];
 
     test('returns true for an invalid string', () => { 
-        expect(isInvalidString(notString)).toBe(true); 
+        expect(isInvalidString(number)).toBe(true); 
+        expect(isInvalidString(undefined)).toBe(true); 
+        expect(isInvalidString(null)).toBe(true);
         expect(isInvalidString(string)).toBe(false); 
     });
 
     test('returns true for an invalid number', () => {
-        expect(isInvalidNum(notNumber)).toBeTruthy;
+        expect(isInvalidNum(string)).toBeTruthy;
+        expect(isInvalidString(undefined)).toBeTruthy; 
+        expect(isInvalidString(null)).toBeTruthy;
         expect(isInvalidNum(number)).toBeFalsey;
     });
 });
 
-describe( "error generator functions should return errors", () => {
-
+describe("error generator functions should return errors", () => {
+  
     test('returns Error object with 400 status and given message', () => {
         expect(generateErr400('BAD REQUEST')).toHaveProperty("message", "BAD REQUEST");    
         expect(generateErr400('BAD REQUEST')).toHaveProperty("status", 400);
@@ -40,7 +42,6 @@ describe( "error generator functions should return errors", () => {
     });
 });
 
-
 describe("checks for valid property keys and values", () => { 
 
     let emptyArr = [];
@@ -50,6 +51,8 @@ describe("checks for valid property keys and values", () => {
     let invalidObj = {name: "cat", description: 5}
     let validObj= {name: "cat", description: "floofy"} 
 
+    let acceptableKeys = ["name", "description"]; 
+
     it('returns an errorMessage for an empty array of keys', () => {
         expect(typeof checkObjFormat(emptyArr)).toBe("string");
         expect(checkObjFormat(emptyArr)).toEqual('Error: Request data is not a valid object. ');
@@ -57,12 +60,12 @@ describe("checks for valid property keys and values", () => {
     });
 
     it('returns an errorMessage for invalid keys', () => {
-        expect(checkObjKeys(invalidKey)).toMatch(/(error)/i);  // matches substring
-        expect(checkObjKeys(validKeys)).toMatch(/(success)/i);
+        expect(checkObjKeys(invalidKey, invalidObj, acceptableKeys)).toMatch(/(error)/i);  // matches substring
+        expect(checkObjKeys(validKeys, validObj, acceptableKeys)).toMatch(/(success)/i);
     });
 
     it('returns an errorMessage for invalid values', () => {
-        expect(checkObjValues(validKeys,invalidObj)).toMatch(/(error)/i);  // matches substring
+        expect(checkObjValues(validKeys,invalidObj)).toMatch(/(error)/i);
         expect(checkObjValues(validKeys, validObj)).toMatch(/(success)/i);
     });
 
