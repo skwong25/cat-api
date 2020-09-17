@@ -14,16 +14,19 @@ const checkObjValues = validate.checkObjValues;
 
 describe( "checks for invalid data type", () => {
     
-    let [ notNumber, number ]= [ "foo", 10 ];
-    let [ notString, string ] = [ 10 , "foo" ];
+    let [ number, string ] = [ 10 , "foo" ];
 
     test('returns true for an invalid string', () => { 
-        expect(isInvalidString(notString)).toBe(true); 
+        expect(isInvalidString(number)).toBe(true); 
+        expect(isInvalidString(undefined)).toBe(true); 
+        expect(isInvalidString(null)).toBe(true); 
         expect(isInvalidString(string)).toBe(false); 
     });
 
     test('returns true for an invalid number', () => {
-        expect(isInvalidNum(notNumber)).toBeTruthy;
+        expect(isInvalidNum(string)).toBeTruthy;
+        expect(isInvalidString(undefined)).toBeTruthy; 
+        expect(isInvalidString(null)).toBeTruthy;
         expect(isInvalidNum(number)).toBeFalsey;
     });
 });
@@ -63,12 +66,12 @@ describe("checks for valid property keys and values", () => {
     });
 
     it('returns an errorMessage for invalid Breed keys', () => {
-        expect(checkObjKeys(invalidKey)).toMatch(/(error)/i);  // matches substring
+        expect(checkObjKeys(invalidKey)).toMatch(/(error)/i);  
         expect(checkObjKeys(validKeys)).toMatch(/(success)/i);
     });
 
     it('returns an errorMessage for invalid values', () => {
-        expect(checkObjValues(validKeys,invalidObj)).toMatch(/(error)/i);  // matches substring
+        expect(checkObjValues(validKeys,invalidObj)).toMatch(/(error)/i); 
         expect(checkObjValues(validKeys, validObj)).toMatch(/(success)/i);
     });
 
