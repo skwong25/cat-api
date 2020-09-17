@@ -31,13 +31,14 @@ const isBreedIdNum = (req, res, next) => {
 
 // checks breed object is populated, has valid keys & values; 
 const checkBreedObj = (req, res, next) => {
-    let object = req.body;               // { key:value, key:values}
-    let keys = Object.keys(object);     // [key, key, key]
+    const object = req.body;               // { key:value, key:values}
+    const keys = Object.keys(object);     // [key, key, key]
+    const validKeys = ["name", "description"]; 
     
-    let arrayOfFunctions = [validate.checkObjFormat, validate.checkBreedObjKeys, validate.checkObjValues];
+    let arrayOfFunctions = [validate.checkObjFormat, validate.checkObjKeys, validate.checkObjValues];
 
     arrayOfFunctions.map((funct) => {
-        let message = funct(keys, object);
+        let message = funct(keys, object, validKeys);
         if (message[0] === "E") {
             const err = validate.generateErr400(message);
             return next(err);

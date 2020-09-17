@@ -5,12 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/buildServer.js",
-    "test": "mocha 'test/catRoutes.test.js' --exit",  
-    "jest": "jest --forceExit",
-    "catRoutes": "jest 'test/catRoutes.test.js'  --detectOpenHandles --forceExit",
-    "breedRoutes": "jest 'test/breedRoutes.test.js'  --detectOpenHandles --forceExit",
-    "validation": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
-    "detectOH": "jest 'test/catRoutes.test.js' --watch --runInBand --detectOpenHandles --forceExit"
+    "test": "npm run unit && npm run integration",
+    "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
+    "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit"
   },
   "repository": {
     "type": "git",

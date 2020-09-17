@@ -26,33 +26,20 @@ function generateErr404(id) {
 // OBJECT CHECKS: to follow pattern -> return error OR success message string. Error message to be prepended with 'Error'.  
 
 // checks for a populated object 
-function checkObjFormat(keys) {
+function checkObjFormat(keys) { 
     let message = (keys.length !== 0) ? 
         'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
     return message; 
 } 
 
 // checks for valid keys 
-function checkObjKeys(keys) {
-    const validKeys = ["name", "ageInYears", "favouriteToy", "description", "breedId"];
+function checkObjKeys(keys, object, validKeys) {
     let invalidKeys = keys.filter((key) => {  // returns condition 
         return !validKeys.includes(key);
     });
     let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
     return message;  
 }
-
-    
-// checks for valid breed object keys 
-function checkBreedObjKeys(keys)  { // [ "name", description" ]
-    const validKeys = ["name", "description"]; 
-    let invalidKeys = keys.filter((key) => {
-        return !validKeys.includes(key);
-    });
-    let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
-    return message;
-}
-
 
 // checks for valid property values  
 function checkObjValues(keys, object) {  
@@ -75,7 +62,6 @@ module.exports = {
     generateErr404,
     checkObjFormat,
     checkObjKeys,
-    checkBreedObjKeys,
     checkObjValues,
 }   
 
