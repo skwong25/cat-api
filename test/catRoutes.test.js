@@ -7,20 +7,15 @@ const buildServer = require('../src/app');
 const generateTestId = {
     generate() {
         return "tmk60ux2b" 
-
     } 
 }
 
 const appTest = buildServer(generateTestId);
 
-
 //==================== user API tests ====================
 
-// afterAll( async (done) => { await server.destroy(); done(); });
-
-
 describe('GET /cats', function () {
-    it('responds with json object containing a list of cats with id & name properties only', function (done) {
+    it('respond with json object containing a list of cats with id & name properties only', function (done) {
         request(appTest)
             .get('/cats')
             .set('Accept', 'application/json')
@@ -55,7 +50,7 @@ describe('GET /cats/:id', function () {
 
 
 describe('GET /cats/:id', function () {
-    it('respond with 404 id not found - passes the validId check', function (done) {
+    it('respond with 404 id not found', function (done) {
         request(appTest)
             .get('/cats/oc12C0X3-g')
             .set('Accept', "text/html; charset=utf-8")
@@ -68,7 +63,8 @@ describe('GET /cats/:id', function () {
             });
     });
 
-    it('respond with 400 invalid parameter - fails the validId check', function (done) {
+    //  tests fail case of isIdValid()
+    it('respond with 400 invalid shortid', function (done) {
         request(appTest)
             .get('/cats/NaN')
             .set('Accept', "text/html; charset=utf-8")
@@ -100,7 +96,7 @@ describe('PUT /cats/:id', function () {
         "favouriteToy": "grass"
     }
 
-    it('responds with 200  - updates age only', function (done) {
+    it('responds with 200  - successfully updates records', function (done) {
         request(appTest)
             .put('/cats/tmk60ux2b')
             .send(overdueBirthday)
@@ -113,13 +109,13 @@ describe('PUT /cats/:id', function () {
             })    
     }); 
 
-    it('responds with 400 bad request - age is incorrect format', function (done) {
+    it('responds with 404 not found', function (done) {
         request(appTest)
-            .put('/cats/tmk60ux2b')
-            .send(falseBirthday)
+            .put('/cats/oc12C0X3-g')
+            .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(400, `Error: Invalid ageInYears parameter: "two"`)
+            .expect(404, `id 'oc12C0X3-g' not found in database`)
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -127,8 +123,8 @@ describe('PUT /cats/:id', function () {
     });  
 })
 
-describe('DEL /cats/:id', function () {
-    it('respond with 204 No Content', function (done) {
+describe('DEL /cats/:id - successfully deletes record', function () {
+    it('respond with 204 no content', function (done) {
         request(appTest)
             .delete('/cats/tmk60ux2b')
             .expect(204)
@@ -143,8 +139,7 @@ describe('DEL /cats/:id', function () {
             .delete('/cats/oc12C0X3-g')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(`id 'oc12C0X3-g' not found in database`) 
-            .expect(404)
+            .expect(404, `id 'oc12C0X3-g' not found in database`)
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -176,7 +171,7 @@ describe('POST /cats', function () {
 
     }
     
-    it('respond with 201 content created - responds with newly-created cat object with generated id property', function (done) {
+    it('respond with 201 content created - successfully creates new cat object with new id', function (done) {
         request(appTest)
             .post('/cats')
             .send(body)
@@ -197,6 +192,7 @@ describe('POST /cats', function () {
             })                                              
     })
 
+    // tests all fail cases of checkObject()
     it('respond with 400 invalid key', function (done) {
         request(appTest)
             .post('/cats')

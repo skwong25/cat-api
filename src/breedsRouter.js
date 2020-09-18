@@ -1,11 +1,12 @@
-// Breed routers 
-// (only contains middleware functions)
+// Breed routers (only contains middleware functions)
 
-// Note: Error handling pattern:
+// MIDDLEWARE FUNCTIONS PATTERN: Execution ends with next() or next(err) 
+
+// ERROR HANDLING PATTERN: 404 errors take an 'unfound id' param // 400 errors take an 'error message' param 
 //  const err = validate.generateErr(errMessage); 
 //  return next(err); 
-// 404 errors take an unfound id param
-// 400 errors take an error message param 
+
+
 
 const express = require('express');  
 const breedsRouter = express.Router();
@@ -36,7 +37,7 @@ const isBreedIdNum = (req, res, next) => {
     };
 }
 
-// checks breed object is populated, has valid keys & values; 
+// checks that the breed object is populated, has valid keys & values; 
 const checkBreedObj = (req, res, next) => {
     const object = req.body;               // { key:value, key:values}
     const keys = Object.keys(object);     // [key, key, key]
@@ -87,7 +88,7 @@ breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
 
 // PUT breed by id 
 breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
-    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.body); 
+    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.object); 
     if (isItUpdated) {
         res.status(200).send(isItUpdated);
     } else {
@@ -98,7 +99,7 @@ breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
 
 // POST breed 
 breedsRouter.post('/', checkBreedObj, (req, res, next) => { 
-    const isItUpdated = breedRepository.addBreed(req.body); 
+    const isItUpdated = breedRepository.addBreed(req.object); 
     if (isItUpdated) {
         console.log("new breed successfully added"); 
         res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK

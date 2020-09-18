@@ -137,7 +137,7 @@ describe('PUT /breeds/:breedId', function () {
             })
     });
 
-    it('respond with 404 NOT FOUND - invalid id', function (done) {
+    it('respond with 404 not found - invalid id', function (done) {
         request(appTest)
             .put('/breeds/9')
             .send(validObj)

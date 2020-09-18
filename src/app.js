@@ -10,7 +10,7 @@ const buildServer = (idGenerator) => {
     const app = express();      
     
     // helper node modules
-    const morgan = require('morgan');                               
+    const morgan = require('morgan');           // TODO check that morgan is being used properly                     
     const bodyParser = require('body-parser');
 
     app.use(express.json());        
