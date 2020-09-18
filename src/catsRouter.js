@@ -23,7 +23,7 @@ class CatsRouter {
             console.log('id verified as valid shortid');
             next() 
         } else {
-            const err = this.validate.generateErr400(`'${id}' is not a valid shortid`));
+            const err = this.validate.generateErr400(`'${id}' is not a valid shortid`);
             return next(err);
         };
     }

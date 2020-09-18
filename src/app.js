@@ -1,7 +1,5 @@
 // CAT API
 
-// QUESTION: Am I confused re. repositories?
-
 const buildServer = (idGenerator) => {
 
     // imports express lib module
@@ -46,14 +44,14 @@ const buildServer = (idGenerator) => {
     });
 
     // sets server up (listening for reqs)
-    const server = app.listen(PORT, () => { 
+    app.listen(PORT, () => { 
         console.log(`the server is listening for catcalls on port ${PORT}`)
     });
 
     return app; 
 }
 
-module.exports = buildServer;   // I can expot as 2 diff things. 
+module.exports = buildServer;   
 
 // we don't want it to export value of the function call because this does not allow us to swap generateId out for a mock.
 //  Maybe another file imports buildServer and calls buildServer(generateId); 

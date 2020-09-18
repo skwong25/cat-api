@@ -8,12 +8,10 @@ const buildServer = require('../src/app');
 const generateTestId = {
     generate() {
         return "tmk60ux2b" 
-
     } 
 }
     
 const appTest = buildServer(generateTestId);
-
 
 //  The function passed as second argument to it() can be passed an optional callback function as its first argument. 
 // When this callback function 'done' is passed, Mocha knows that the test is for asynchronous functionality.
