@@ -15,7 +15,7 @@ const appTest = buildServer(generateTestId);
 //==================== user API tests ====================
 
 describe('GET /cats', function () {
-    it('respond with json object containing a list of cats with id & name properties only', function (done) {
+    it('responds with a json object containing a list of cats with id & name properties only', function (done) {
         request(appTest)
             .get('/cats')
             .set('Accept', 'application/json')
