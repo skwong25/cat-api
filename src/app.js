@@ -1,7 +1,5 @@
 // CAT API
 
-// QUESTION: Am I confused re. repositories?
-
 const buildServer = (idGenerator) => {
 
     // imports express lib module
@@ -10,7 +8,7 @@ const buildServer = (idGenerator) => {
     const app = express();      
     
     // helper node modules
-    const morgan = require('morgan');                               
+    const morgan = require('morgan');           // TODO check that morgan is being used properly                     
     const bodyParser = require('body-parser');
 
     app.use(express.json());        
@@ -53,7 +51,7 @@ const buildServer = (idGenerator) => {
     return app; 
 }
 
-module.exports = buildServer;  
+module.exports = buildServer;   
 
 // we don't want it to export value of the function call because this does not allow us to swap generateId out for a mock.
 //  Maybe another file imports buildServer and calls buildServer(generateId); 

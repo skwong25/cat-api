@@ -7,7 +7,8 @@
     "start": "node src/buildServer.js",
     "test": "npm run unit && npm run integration",
     "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
-    "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit"
+    "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit",
+    "lone": "mocha 'test/breedRoutes.test.js' --exit" 
   },
   "repository": {
     "type": "git",

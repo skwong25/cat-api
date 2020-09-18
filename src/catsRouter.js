@@ -8,12 +8,10 @@ class CatsRouter {
         this.catRepository = catRepository;
 
         this.isIdValid = this.isIdValid.bind(this);     
-        // this.checkObjValues = this.checkObjValues.bind(this);  
         this.checkObject = this.checkObject.bind(this); 
     }
     // Note that methods that contain neighbouring method calls require binding to the class
 
-    // MIDDLEWARE FUNCTIONS: 
     // checks if id is a valid shortid                          
     isIdValid(req, res, next) {  
 
@@ -25,12 +23,13 @@ class CatsRouter {
             console.log('id verified as valid shortid');
             next() 
         } else {
-            return next(this.validate.generateErr400(`'${id}' is not a valid shortid`));
+            const err = this.validate.generateErr400(`'${id}' is not a valid shortid`);
+            return next(err);
         };
     }
 
-    // consolidates Object checks 
-    // Each check function returns a message - messages prepended with "Error.." are passed onto generate error. 
+    // consolidates Object checks: Each check function returns Error or Success message - those prepended with "Error.." are passed onto generate error. 
+
     checkObject(req, res, next) { 
 
         const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
@@ -48,8 +47,7 @@ class CatsRouter {
                 console.log(message);
             };
         });
-
-    req.object = object;         
+    req.object = object;  // reassignment of req.body to req.object is another check that its successfully passed this check 
     next()
     }
     

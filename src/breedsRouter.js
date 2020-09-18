@@ -1,11 +1,12 @@
-// Breed routers 
-// (only contains middleware functions)
+// Breed routers (only contains middleware functions)
 
-// Note: Error handling pattern:
+// MIDDLEWARE FUNCTIONS PATTERN: Execution ends with next() or next(err) 
+
+// ERROR HANDLING PATTERN: 404 errors take an 'unfound id' param // 400 errors take an 'error message' param 
 //  const err = validate.generateErr(errMessage); 
 //  return next(err); 
-// 404 errors take an unfound id param
-// 400 errors take an error message param 
+
+
 
 const express = require('express');  
 const breedsRouter = express.Router();
@@ -13,6 +14,13 @@ const breedsRouter = express.Router();
 // imports class instance 
 const breedRepository = require('./breedsRepo'); 
 const validate = require('./validationFunctions'); 
+
+// imported validation functions
+const generateErr400 = validate.generateErr400; 
+const generateErr404 = validate.generateErr404; 
+const checkObjFormat = validate.checkObjFormat; 
+const checkObjKeys = validate.checkObjKeys; 
+const checkObjValues = validate.checkObjValues; 
 
 
 // checks breed id type 
@@ -24,23 +32,23 @@ const isBreedIdNum = (req, res, next) => {
         console.log(`breed id ${id} verified as ${typeof id}`);
         next() 
     } else {
-        const err = validate.generateErr400(`'${id}' is not a valid id`);
+        const err = generateErr400(`'${id}' is not a valid id`);
         return next(err); 
     };
 }
 
-// checks breed object is populated, has valid keys & values; 
+// checks that the breed object is populated, has valid keys & values; 
 const checkBreedObj = (req, res, next) => {
     const object = req.body;               // { key:value, key:values}
     const keys = Object.keys(object);     // [key, key, key]
     const validKeys = ["name", "description"]; 
     
-    let arrayOfFunctions = [validate.checkObjFormat, validate.checkObjKeys, validate.checkObjValues];
+    let arrayOfFunctions = [checkObjFormat, checkObjKeys, checkObjValues];
 
     arrayOfFunctions.map((funct) => {
         let message = funct(keys, object, validKeys);
         if (message[0] === "E") {
-            const err = validate.generateErr400(message);
+            const err = generateErr400(message);
             return next(err);
         } else {
             console.log(message);  
@@ -62,7 +70,7 @@ breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {
     if (foundBreed) {  
         res.send(foundBreed); 
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     }
 })
@@ -70,33 +78,33 @@ breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {
 // DEL breed by id 
 breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
     const isItDeleted = breedRepository.deleteBreedById(req.breedId); 
-    if (isItDeleted) {              // deleteBreedById should return a truth or if it can't find the id, returns false 
+    if (isItDeleted) {               
         res.status(204).send();
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     };
 })
 
 // PUT breed by id 
 breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
-    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.body); // req.breedId = 1
+    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.object); 
     if (isItUpdated) {
         res.status(200).send(isItUpdated);
     } else {
-        const err = validate.generateErr404(req.breedId);
+        const err = generateErr404(req.breedId);
         return next(err);
     };
 })
 
 // POST breed 
-breedsRouter.post('/', checkBreedObj, (req, res, next) => { // Checks keys (of req.body) are valid data type and acceptable parameters?  
-    const isItUpdated = breedRepository.addBreed(req.body); 
+breedsRouter.post('/', checkBreedObj, (req, res, next) => { 
+    const isItUpdated = breedRepository.addBreed(req.object); 
     if (isItUpdated) {
-        console.log("new breed successfully added");
-        res.status(201).send(); // 201 is NO CONTENT 
+        console.log("new breed successfully added"); 
+        res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK
     } else { 
-        const err = validate.generateErr400('Breed could not be added to breed database');
+        const err = generateErr400('Breed could not be added to breed database');  
         return next(err);
     }
 })
