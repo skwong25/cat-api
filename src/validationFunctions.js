@@ -20,7 +20,7 @@ function generateErr400(message) {
 } 
 
 // 404 - NOT FOUND
-generateErr404() receives a string of an id which has not been found in the database. Returns an 400 NOT FOUND error.
+// generateErr404() receives a string of an id which has not been found in the database. Returns an 400 NOT FOUND error.
 function generateErr404(id) {
     let message = `id '${id}' not found in database`
     const newError = new Error(message);
