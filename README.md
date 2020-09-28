@@ -1,22 +1,24 @@
 
 # Cat API #
 
-# A REST API using ExpressJS#
+# A REST API using ExpressJS
 
-A data repository to manage information about cats and breeds via the HTTP request-response cycle.
+A data repository to manage information about cats and pedigree breeds via the HTTP request-response cycle.
 
 # Getting Started #
 
-Run 'npm start' on Terminal.
+If npm is not yet installed (run 'npm -v' in Terminal to check), run 'npm install' to install. 
+Run 'npm start' on Terminal to start the server. 
 
-Access via web browser at ???
+See section [How To Use](HowTo) to begin sending http requests. 
+See section [Tests](HowToTest) for how to run test suites. 
 
 ## Motivation
 
-To create an API with full CRUD functionality to put knowledge of **Javascript** and the **ExpressJS** framework into practice.  
-It provided the opportunity to use the **mocha** framework, **jest** and **supertest** library for writing unit and integration tests. 
+To create an API with full CRUD functionality to put knowledge of [Javascript](https://www.javascript.com/) and the [ExpressJS](https://expressjs.com/) framework into practice.  
+It provided the opportunity to use the [mocha](https://mochajs.org/) framework, [jest](https://jestjs.io/) and [supertest](https://www.npmjs.com/package/supertest) library for writing unit and integration tests. 
 
-It helped me to develop my **github** workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.    
+It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.    
 
 ## Code Style
 
@@ -26,7 +28,7 @@ This project follows standard JS codestyle and *contributions should be validate
 
 - [ExpressJS](https://expressjs.com/) 
 - [Postman API development tool](https://www.postman.com/)
-- [Jest testing framework](https://jestjs.io/), [Mocha testing framework] (https://mochajs.org/) & [Supertest Testing Library](https://www.npmjs.com/package/supertest)
+- [Jest testing framework](https://jestjs.io/), [Mocha testing framework](https://mochajs.org/) & [Supertest Testing Library](https://www.npmjs.com/package/supertest)
 - This project was bootstrapped with ???
 
 ## Features
@@ -150,17 +152,11 @@ addCat() receives a cat object to be added to the database. It attaches a new un
 
 ## Validation Functions ##
 
-Non-middleware simple JS functions exist within a separate module from the Router and Repository files:
+Non-middleware simple JS functions are held within a separate module from the Router and Repository files. 
 
-isInvalidString() checks the data type of a passed argument. Returns a truthy in the event of a non-string. Else, returns falsey. 
-isInvalidNum() checks the data type of a passed argument. Returns a truthy in the event of a non-number. Else, returns falsey. 
+These include object check functions, which receive an array of keys, acceptable keys and the request object as arguments. 
 
-generateErr400() receives a string argument of a descriptive error message. Returns an 400 BAD REQUEST error.
-generateErr404() receives a string of an id which has not been found in the database. Returns an 400 NOT FOUND error.
-
-The following object check functions receive an array of keys, acceptable keys and the request object as arguments:
-
-checkObjFormat() recchecks that the passed object is populated. 
+checkObjFormat() rechecks that the passed object is populated. 
 checkObjKeys() checks that the objects keys are valid. Only keys "name", "ageInYears", "favouriteToy" and "description" will be accepted. 
 checkObjValues() checks that the objects values are valid. Only values of 'string' data type (or 'number' for ageInYears) will be accepted. 
 
@@ -222,6 +218,7 @@ GET /cats 200 193 - 1.414 ms
 app.use(express.json()); 
 ```    
 
+###HowToTest
 ## Tests
 
 To run all tests, run `npm test` in Terminal. If all tests pass, you will see the screens below:
@@ -280,6 +277,7 @@ describe('GET /cats/:id', function () {
 To run integration test suites (for both cat and breed repositories), run `npm run integration` in Terminal. 
 
 
+###HowTo  
 ## How to use?
 
 1.  Enter 'npm start' in Terminal. The tab will now read 'node'
