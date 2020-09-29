@@ -211,8 +211,6 @@ GET /cats 200 193 - 1.414 ms
 ]
 ```
 
-> Formerly the app used body-parser middleware to parse incoming request body, available as a property of req.body. However current express version v.14.17.1 has parsing built-in: 
-
 ```javascript
 // app.js
 app.use(express.json()); 
