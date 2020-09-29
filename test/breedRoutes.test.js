@@ -217,5 +217,5 @@ describe('DEL /breeds/:id', function () {
                 if (err) return done(err); 
                 done(); 
             })
-    })
+    });
 })

@@ -1,5 +1,4 @@
 
-const request =  require('supertest');
 const validate = require('../src/validationFunctions');
 
 const isInvalidString = validate.isInvalidString; 

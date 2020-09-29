@@ -1,14 +1,18 @@
 
-// SIMPLE JS FUNCTIONS: 
+// SIMPLE JS FUNCTIONS:
+
+// isInvalidString() checks the data type of a passed argument. Returns a truthy in the event of a non-string. Else, returns falsey. 
 function isInvalidString(value) {
     return typeof value !== "string"                                  
 }
-    
+
+// isInvalidNum() checks the data type of a passed argument. Returns a truthy in the event of a non-number. Else, returns falsey. 
 function isInvalidNum(value) {  
-        return typeof(value) !== "number";  
+    return typeof(value) !== "number";  
 }
-    
+
 // 400 - BAD REQUEST
+// generateErr400() receives a string argument of a descriptive error message. Returns an 400 BAD REQUEST error.
 function generateErr400(message) { 
     const newError = new Error(message);
     newError.status = 400; 
@@ -16,6 +20,7 @@ function generateErr400(message) {
 } 
 
 // 404 - NOT FOUND
+// generateErr404() receives a string of an id which has not been found in the database. Returns an 400 NOT FOUND error.
 function generateErr404(id) {
     let message = `id '${id}' not found in database`
     const newError = new Error(message);

@@ -6,8 +6,6 @@
 //  const err = validate.generateErr(errMessage); 
 //  return next(err); 
 
-
-
 const express = require('express');  
 const breedsRouter = express.Router();
 

@@ -8,12 +8,11 @@ const buildServer = (idGenerator) => {
     const app = express();      
     
     // helper node modules
-    const morgan = require('morgan');           // TODO check that morgan is being used properly                     
-    const bodyParser = require('body-parser');
+    const morgan = require('morgan');                         
 
+    app.use(morgan('tiny'));
     app.use(express.json());        
-    app.use(bodyParser.json())    
-    // Note that bodyParser attaches parsed JSON object to req.body                              
+    // Note that expresses' in-built bodyParser attaches parsed JSON object to req.body                              
 
     // imports & class instantiation of repositories and routers
     // note module.exports = {repository: CatRepository}
@@ -27,14 +26,14 @@ const buildServer = (idGenerator) => {
     const CatsRouter = importRouterObject.router;
     const catsRouter = new CatsRouter(catRepository); 
 
+ 
+
     catsRouter.initializeRoutes(); // calls the routes 
 
-    app.use('/cats', catsRouter.catsRouter);  // TypeError: Router.use() requires a middleware function but got a Object 
+    app.use('/cats', catsRouter.catsRouter);  
     app.use('/breeds', breedsRouter);
 
     const PORT = 4001;
-
-    app.use(morgan('tiny'));
 
     // error-handling sends back error responses 
     app.use((err, req, res, next) => {
