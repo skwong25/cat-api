@@ -82,12 +82,6 @@ d. Goals or Product and Technical Requirements
         Later can be reviewed and DRY-ed from then on. 
         
         +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-        All 'database connector' functions begin by opening connection to db, and end with closing the connection: 
-
-        let db = new sqlite3.Database(<database path >)  
-        ...
-        db.close()
         
         3 - 5. 
         Each request type requires a different sqlite3 method & SQL query: 
