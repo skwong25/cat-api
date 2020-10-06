@@ -27,11 +27,11 @@ d. Goals or Product and Technical Requirements
 
     Product requirements: 
         1. We should have a pre-populated SQLite database on the file system. 
-        2. Upon start-up of the Cat API Express server, it should establish a connection to the SQL database - or should it?  
+        2. Upon start-up of the Cat API Express server, it should establish a connection to the SQL database.
         3. The Cat API should be able to read from the SQLite database for GET all & GET by id requests and return objects. 
         4. The Cat API should be able to write to the SQLite database for POST & PUT requests and return new/updated objects. 
-        4. The Cat API should be able to delete from the SQLite database for DEL requests. 
-        
+        5. The Cat API should be able to delete from the SQLite database for DEL requests. 
+        6. When the application is closed manually (via ctrl-c) the connection & server should shutdown gracefully. 
 
     Technical requirements: 
         
@@ -124,6 +124,17 @@ d. Goals or Product and Technical Requirements
                         db.run INSERT INTO table ([arrayOfKeys]) VALUES ([arrayOfValuesToBeUpdated]); 
                         db.get SELECT * FROM table WHERE id = ?;  
         
+        +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        6. 
+        The SIGTERM event is emitted when the Node application is manually exited via Ctrl-C:
+        We will add a listener on the process core module, to close the server and connection, then exit. 
+        process.on('SIGTERM', ()=>{
+            db.close();
+            server.close();
+            process.exit();
+        })
+
 
 f. Future Goals
 
