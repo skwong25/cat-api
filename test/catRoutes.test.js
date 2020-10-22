@@ -1,16 +1,11 @@
-// next we will write an API test for '/breed routes' GET and GET by id: 
+// ids:
+// {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
 
 const request = require('supertest');
 const should = require('should');
 
 const buildServer = require('../src/app'); 
-const generateTestId = {
-    generate() {
-        return "tmk60ux2b" 
-    } 
-}
-
-const appTest = buildServer(generateTestId);
+const appTest = buildServer();
 
 //==================== user API tests ====================
 
@@ -37,7 +32,7 @@ describe('GET /cats', function () {
 describe('GET /cats/:id', function () {
     it('respond with json object containing detailed information on a single cat', function (done) {
         request(appTest)
-            .get('/cats/tmk60ux2b')
+            .get('/cats/1c2A5dmtr')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -98,7 +93,7 @@ describe('PUT /cats/:id', function () {
 
     it('responds with 200  - successfully updates records', function (done) {
         request(appTest)
-            .put('/cats/tmk60ux2b')
+            .put('/cats/1c2A5dmtr')
             .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', /json/)  
@@ -126,7 +121,7 @@ describe('PUT /cats/:id', function () {
 describe('DEL /cats/:id - successfully deletes record', function () {
     it('respond with 204 no content', function (done) {
         request(appTest)
-            .delete('/cats/tmk60ux2b')
+            .delete('/cats/1c2A5dmtr')
             .expect(204)
             .end((err) => {
                 if (err) return done(err); 

@@ -32,6 +32,7 @@ function generateErr404(id) {
 
 // checks for a populated object 
 function checkObjFormat(keys) { 
+    console.log(`keys: ${keys}`);
     let message = (keys.length !== 0) ? 
         'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
     return message; 

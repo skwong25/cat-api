@@ -1,6 +1,16 @@
+// note that breedRepo class object also should be instantiated here and passed dao, for consistency. 
+
 // CAT API
 
-const buildServer = (idGenerator) => {
+const buildServer = () => {
+
+    const path = require('path')
+    const dbPath = path.resolve(__dirname, '../sqlite/tables.db')
+
+    // instantiates dao class to be passed as param into Repo classes 
+    // upon instantiation, this starts up a SQLite database connection
+    const AppDAO = require('./dao'); 
+    const dao = new AppDAO(dbPath); 
 
     // imports express lib module
     // express() instantiates app 
@@ -12,30 +22,31 @@ const buildServer = (idGenerator) => {
 
     app.use(morgan('tiny'));
     app.use(express.json());        
-    // Note that expresses' in-built bodyParser attaches parsed JSON object to req.body                              
+    // Note Expresses' in-built bodyParser attaches parsed JSON object to req.body                              
 
-    // imports & class instantiation of repositories and routers
-    // note module.exports = {repository: CatRepository}
+    // class instantiation of imported repositories and routers
+
+    // note breedsRouter = express.Router() - router instance created in breedsRouter.js 
     const breedsRouter = require('./breedsRouter');
-
+    
+    // note ./catsRepo module.exports = {repository: CatRepository}
     const importObject = require('./catsRepo'); 
     const CatRepository = importObject.repository; 
-    const catRepository = new CatRepository(idGenerator.generate); 
-
+    const catRepository = new CatRepository(dao); 
+    
     const importRouterObject = require('./catsRouter');      
     const CatsRouter = importRouterObject.router;
     const catsRouter = new CatsRouter(catRepository); 
 
- 
+    catsRouter.initializeRoutes(); // calls routing method/handlers 
 
-    catsRouter.initializeRoutes(); // calls the routes 
-
+    // Note .catsRouter is a method on the class instance which creates an instance of router 
     app.use('/cats', catsRouter.catsRouter);  
     app.use('/breeds', breedsRouter);
 
     const PORT = 4001;
 
-    // error-handling sends back error responses 
+    // error-handling middleware sends back error responses 
     app.use((err, req, res, next) => {
         let status = err.status || 500  
         let message = err.message || 'test message'
@@ -50,11 +61,7 @@ const buildServer = (idGenerator) => {
     return app; 
 }
 
-module.exports = buildServer;   
-
-// we don't want it to export value of the function call because this does not allow us to swap generateId out for a mock.
-//  Maybe another file imports buildServer and calls buildServer(generateId); 
-
+module.exports = buildServer();   
 
 // How do we verify that request data in PUT/POST requests is a JSON object?
 // The bodyparser recognises JSON and parse it into an object attached to req.body 

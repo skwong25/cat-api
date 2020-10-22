@@ -22,7 +22,7 @@ const checkObjValues = validate.checkObjValues;
 
 
 // checks breed id type 
-const isBreedIdNum = (req, res, next) => { 
+const isBreedIdNum = function (req, res, next) { 
     console.log('breed id being verified');
     const id = Number(req.params.breedId);                   
     if (id) {   
@@ -57,54 +57,78 @@ const checkBreedObj = (req, res, next) => {
 } 
 
 // GET route all 
-breedsRouter.get('/', (req, res, next) => {
-    const breeds = breedRepository.getAllBreeds; // this returns an array of objects
-    res.json({"breeds": breeds}); 
+breedsRouter.get('/', async function (req, res, next) {
+    console.log("test1"); 
+    try {
+        console.log("test2"); 
+        const breeds = breedRepository.getAllBreeds(); // this returns an array of objects
+        console.log("test3");
+        console.log(breeds);  
+        res.json({"breeds": breeds});
+    } catch (err) {
+        next(err); 
+    };
 })
 
 // GET breed by id
-breedsRouter.get('/:breedId', isBreedIdNum, (req, res, next) => {  
-    const foundBreed = breedRepository.getBreedById(req.breedId);  
-    if (foundBreed) {  
-        res.send(foundBreed); 
-    } else {
-        const err = generateErr404(req.breedId);
-        return next(err);
-    }
+breedsRouter.get('/:breedId', isBreedIdNum, async function (req, res, next) { 
+    try { 
+        const foundBreed = await breedRepository.getBreedById(req.breedId);  
+        if (foundBreed) {  
+            res.send(foundBreed); 
+        } else {
+            const err = generateErr404(req.breedId);
+            return next(err);
+        }
+    } catch (err) {
+        next(err);
+    };
 })
 
 // DEL breed by id 
-breedsRouter.delete('/:breedId', isBreedIdNum, (req, res, next) => {
-    const isItDeleted = breedRepository.deleteBreedById(req.breedId); 
-    if (isItDeleted) {               
-        res.status(204).send();
-    } else {
-        const err = generateErr404(req.breedId);
-        return next(err);
+breedsRouter.delete('/:breedId', isBreedIdNum, async function (req, res, next) {
+    try {
+        const isItDeleted = await breedRepository.deleteBreedById(req.breedId); 
+        if (isItDeleted) {               
+            res.status(204).send();
+        } else {
+            const err = generateErr404(req.breedId);
+            return next(err);
+        };
+    } catch (err) {
+        next(err);
     };
 })
 
 // PUT breed by id 
-breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, (req, res, next) => {
-    const isItUpdated = breedRepository.updateBreedById(req.breedId, req.object); 
-    if (isItUpdated) {
-        res.status(200).send(isItUpdated);
-    } else {
-        const err = generateErr404(req.breedId);
-        return next(err);
+breedsRouter.put('/:breedId', isBreedIdNum, checkBreedObj, async function (req, res, next) {
+    try {
+        const isItUpdated = await breedRepository.updateBreedById(req.breedId, req.object); 
+        if (isItUpdated) {
+            res.status(200).send(isItUpdated);
+        } else {
+            const err = generateErr404(req.breedId);
+            return next(err);
+        };
+    } catch (err) {
+        next(err);
     };
 })
 
 // POST breed 
-breedsRouter.post('/', checkBreedObj, (req, res, next) => { 
-    const isItUpdated = breedRepository.addBreed(req.object); 
-    if (isItUpdated) {
-        console.log("new breed successfully added"); 
-        res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK
-    } else { 
-        const err = generateErr400('Breed could not be added to breed database');  
-        return next(err);
-    }
+breedsRouter.post('/', checkBreedObj, async function (req, res, next) { 
+    try {
+        const isItUpdated = await breedRepository.addBreed(req.object); 
+        if (isItUpdated) {
+            console.log("new breed successfully added"); 
+            res.status(200).send(isItUpdated); // 201 is NO CONTENT 200 is OK
+        } else { 
+            const err = generateErr400('Breed could not be added to breed database');  
+            return next(err);
+        }
+    } catch (err) {
+        next(err);
+    };
 })
 
 module.exports = breedsRouter;
