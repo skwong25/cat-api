@@ -47,12 +47,26 @@ class AppDAO {
                 if (err) {
                     reject(err)
                 } else {
-                    arr = rows.map((row) => {return {'id':row.id, 'name': row.name}});
-                    // TODO: 
-                    // single responsibility principle: arguably should process data only in Repo files? 
-                    // can do this in the callback in the dao.get() function call  
-                    // callback would be passed as a parameter
+                    arr = rows.map((row) => {return {'id':row.id, 'breedId':row.breedId, 'name': row.name}});
+                    // single responsibility principle: arguably we should process data only in Repo files.
+                    // can do this in the callback in the dao.get() function call, with callback would be passed as a parameter
                     console.log(`dao: ${JSON.stringify(arr)}`);
+                }
+            resolve(arr);
+            })
+        })
+    }
+
+    allId(sql) {
+        return new Promise((resolve, reject) => {  
+            let arr = []; 
+            this.db.all(sql, function (err, rows) {
+                if (err) {
+                    reject(err)
+                } else {
+                    console.log('row: ' + JSON.stringify(rows)); 
+                    arr = rows.map((row) => {return row.breedId});
+                    console.log(`dao array of ids: ${JSON.stringify(arr)}`);
                 }
             resolve(arr);
             })

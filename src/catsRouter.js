@@ -10,7 +10,7 @@ class CatsRouter {
         this.isIdValid = this.isIdValid.bind(this);     
         this.checkObject = this.checkObject.bind(this); 
     }
-    // Note that methods that contain neighbouring method calls require binding to the class
+    // Note that methods that are CALLED in neighbouring methods require binding to the class 
 
     // checks if id is a valid shortid                          
     isIdValid(req, res, next) {  

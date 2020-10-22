@@ -4,8 +4,7 @@
 const request = require('supertest');
 const should = require('should');
 
-const buildServer = require('../src/app'); 
-const appTest = buildServer();
+const appTest = require('../src/app'); 
 
 //==================== user API tests ====================
 
@@ -19,7 +18,7 @@ describe('GET /cats', function () {
                 let object = JSON.stringify(res.body); // Note that this parsing from JSON to JS object - only allows us to console log result 
                 console.log("object: " + object);    // {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
                 res.body.cats[0].should.have.property('id');
-                res.body.cats[0].should.have.property('name','Catty');
+                res.body.cats[0].should.have.property('name','Frank');
             })
             .expect(200)
             .end((err) => {
@@ -32,9 +31,9 @@ describe('GET /cats', function () {
 describe('GET /cats/:id', function () {
     it('respond with json object containing detailed information on a single cat', function (done) {
         request(appTest)
-            .get('/cats/1c2A5dmtr')
+            .get('/cats/uKVZvMxhLt')
             .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
+            // .expect('Content-Type', /json/)
             .expect(200)
             .end((err) => {
                 if (err) return done(err); 
@@ -85,6 +84,12 @@ describe('PUT /cats/:id', function () {
         "favouriteToy": "grass"
     }
 
+    const underdueBirthday = {
+        "name": "Catty",
+        "ageInYears": 1,
+        "favouriteToy": "grass"
+    }
+
     const falseBirthday = {
         "name": "Catty",
         "ageInYears": "two",
@@ -93,10 +98,23 @@ describe('PUT /cats/:id', function () {
 
     it('responds with 200  - successfully updates records', function (done) {
         request(appTest)
-            .put('/cats/1c2A5dmtr')
+            .put('/cats/o6qjxIQAV')
             .send(overdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
-            .expect('Content-Type', /json/)  
+            // .expect('Content-Type', /json/)  
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
+    }); 
+
+    it('responds with 200  - successfully updates records', function (done) {
+        request(appTest)
+            .put('/cats/o6qjxIQAV')
+            .send(underdueBirthday)
+            .set('Accept', "text/html; charset=utf-8")
+            // .expect('Content-Type', /json/)  
             .expect(200)
             .end((err) => {
                 if (err) return done(err); 
@@ -118,10 +136,10 @@ describe('PUT /cats/:id', function () {
     });  
 })
 
-describe('DEL /cats/:id - successfully deletes record', function () {
-    it('respond with 204 no content', function (done) {
+describe('DEL /cats/:id', function () {
+    it('successfully deletes record, respond with 204 no content', function (done) {
         request(appTest)
-            .delete('/cats/1c2A5dmtr')
+            .delete('/cats/oASLxZgfR')
             .expect(204)
             .end((err) => {
                 if (err) return done(err); 
@@ -131,10 +149,10 @@ describe('DEL /cats/:id - successfully deletes record', function () {
 
     it('respond with 404 id not found', function (done) {
         request(appTest)
-            .delete('/cats/oc12C0X3-g')
+            .delete('/cats/oc12C0X3-h')
             .set('Accept', "text/html; charset=utf-8")
-            .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, `id 'oc12C0X3-g' not found in database`)
+            // .expect('Content-Type', "text/html; charset=utf-8")
+            .expect(404, `id 'oc12C0X3-h' not found in database`)
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -171,14 +189,15 @@ describe('POST /cats', function () {
             .post('/cats')
             .send(body)
             .set('Accept', 'application/x-www-form-urlencoded')
-            .expect('Content-Type', /json/)                                    
+            // .expect('Content-Type', /json/)                                    
             .expect(function (res) {
                 let object = JSON.stringify(res.body);  
                 console.log("object: " + object);    
-                res.body.name.should.equal('JimJam');
-                res.body.ageInYears.should.equal(5);
-                res.body.favouriteToy.should.equal('amazing technicolour dreamcoat');
+                res.body.should.have.property('name','JimJam');
+                res.body.should.have.property('ageInYears',5);
+                res.body.should.have.property('favouriteToy','amazing technicolour dreamcoat');
                 res.body.should.have.property('id');
+                res.body.should.have.property('breedId');
             })
             .expect(201)   
             .end((err) => {

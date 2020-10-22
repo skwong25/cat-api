@@ -12,7 +12,6 @@ class CatRepository {
         this.updateCatById = this.updateCatById.bind(this);
         this.deleteCatById = this.deleteCatById.bind(this);
         this.checkForId = this.checkForId.bind(this);
-        // this.getAllCats = this.getAllCats.bind(this);
     }
 
     // Note that methods that contain neighbouring method calls require binding to the class
@@ -51,7 +50,7 @@ class CatRepository {
                 let isId = await dao2.get(  
                     'SELECT id FROM cats \ WHERE id = ?;', [id])
                 console.log('repo id check: ' + JSON.stringify(isId));
-                return isId ? true : false ;
+                return isId ? true : false;
             } catch (err) {
                 console.log(err); 
             } 
@@ -149,7 +148,9 @@ class CatRepository {
 
         const getProm = async function () {
             try {
-                if (!checkForId(id)) {
+                let outcome = await checkForId(id)
+                if ( outcome === false) {
+                    console.log('repo: cat not found')
                     return null;
                 } else {
                     let isCat = await dao2.run(
@@ -173,4 +174,5 @@ module.exports.repository = CatRepository
 
 // Note that if a module is imported multiple times, but with the same specifier (i.e. path), 
 // the JavaScript specification guarantees that you’ll receive the same module instance. 
-// Above, we should expect that although the class instance is imported in app.js AND catsRouter, it will be the same instance. 
+// Above, we should expect that although the class object is imported in app.js AND catsRouter, it will be the same instance. 
+// However, if it is instantiated in two separate places it will be two separate class instances. 

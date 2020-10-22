@@ -24,25 +24,31 @@ const buildServer = () => {
     app.use(express.json());        
     // Note Expresses' in-built bodyParser attaches parsed JSON object to req.body                              
 
-    // class instantiation of imported repositories and routers
+    // class instantiation of imported repositories and router classes
+    let importObject = require('./breedsRepo'); 
+    const BreedRepository = importObject.repository; 
+    const breedRepository = new BreedRepository(dao); 
 
-    // note breedsRouter = express.Router() - router instance created in breedsRouter.js 
-    const breedsRouter = require('./breedsRouter');
+    let importRouterObject = require('./breedsRouter');      
+    const BreedsRouter = importRouterObject.router;
+    const breedsRouter = new BreedsRouter(breedRepository); 
     
     // note ./catsRepo module.exports = {repository: CatRepository}
-    const importObject = require('./catsRepo'); 
+    importObject = require('./catsRepo'); 
     const CatRepository = importObject.repository; 
     const catRepository = new CatRepository(dao); 
     
-    const importRouterObject = require('./catsRouter');      
+    importRouterObject = require('./catsRouter');      
     const CatsRouter = importRouterObject.router;
     const catsRouter = new CatsRouter(catRepository); 
 
-    catsRouter.initializeRoutes(); // calls routing method/handlers 
+    // calls routing method/handlers 
+    breedsRouter.initializeRoutes(); 
+    catsRouter.initializeRoutes();
 
-    // Note .catsRouter is a method on the class instance which creates an instance of router 
+    // Note .Router is a method on the class instance that creates instance of Express router
     app.use('/cats', catsRouter.catsRouter);  
-    app.use('/breeds', breedsRouter);
+    app.use('/breeds', breedsRouter.breedsRouter);
 
     const PORT = 4001;
 

@@ -17,21 +17,14 @@ this.breeds = [
     ]
 */
 
-// instantiates dao class to be passed as param into Repo classes 
-// upon instantiation, this starts up a SQLite database connection
-const path = require('path')
-const dbPath = path.resolve(__dirname, '../sqlite/tables.db')
-const AppDAO = require('./dao'); 
-const dao = new AppDAO(dbPath); 
-// Difference between catRepo & breedRepo class instances:
-// catRepo is instantiated in app.js, so dao is imported and instantiated there to be passed in as a parameter
-// whereas breedRepo is instantiated here, so dao needs to be imported & instantiated here. 
-// Ideally for consistency, breedRepo would be instantiated in the same place as catRepo so we only import & instantiate dao in ONE PLACE. 
-
 class BreedRepository {
     constructor(dao) {
         this.dao = dao; 
+
+        this.checkForId = this.checkForId.bind(this);
+        this.getBreedById = this.getBreedById.bind(this);
     }
+    // Note that methods used in/containing neighbouring method calls require binding to the class
 
     // returns a summary list of breed objects 
     getAllBreeds() {
@@ -48,14 +41,14 @@ class BreedRepository {
         return getProm();
     }
 
-    // used in updateBreedById and deleteBreedById - returns true or false 
+    // member function used in updateBreedById and deleteBreedById - returns true or false 
     checkForId(id) {
 
         const dao2 = this.dao;
 
         const getProm = async function () {
             try {
-                const isId = await dao2.get('SELECT id FROM breeds WHERE breedId = ?;', [id]);
+                const isId = await dao2.get('SELECT breedId FROM breeds WHERE breedId = ?;', [id]);
                 // returns either id or undefined 
                 return isId? true : false 
             } catch (err) {
@@ -75,7 +68,7 @@ class BreedRepository {
                 if (!checkForId(id)) {
                     return null;
                 } else {
-                    const getBreed = await dao2.get('SELECT * FROM breeds WHERE id = ?;', id);
+                    const getBreed = await dao2.get('SELECT * FROM breeds WHERE breedId = ?;', [id]);
                     return getBreed; 
                 };
             } catch (err) {
@@ -97,12 +90,15 @@ class BreedRepository {
                     return null;
                 } else {
                     // iterates through object to create a string of keys and values in format: 'column = value column2 = value2'
-                    let arr;
+                    let arr = []; 
+                    console.log('object:' + JSON.stringify(object));
                     for (let key in object) {
-                        arr.push(`${key} = '${object.key}' `);   
+                        arr.push(` ${key} = '${object[key]}'`);   
                     }
-                    await dao2.run('UPDATE breeds SET ? WHERE id = ?;', arr, id);
-                    let checkNewRecord = getBreedById(id);  // TODO: check that we don't need to await return value of this method 
+                    console.log('arr: ' + arr); 
+                    let sql = `UPDATE breeds SET ${arr.join()} WHERE breedId = ?;`
+                    await dao2.run(sql,[id]);
+                    let checkNewRecord = getBreedById(id);  
                     return checkNewRecord; 
                 };
             } catch (err) {
@@ -115,21 +111,19 @@ class BreedRepository {
     addBreed(object) { 
 
         const dao2 = this.dao;
-        const checkForId = this.checkForId; 
+        const getBreedById = this.getBreedById; 
 
         const getProm = async function () {
             try {
-                // gets new id value. 
-                // Note that dao2.get() returns [{},{},{]}] - need to test if iterator works on this ok 
-                let idArray = await dao2.get('SELECT id FROM breeds;'); 
-                // .reduce() returns the highest missing id value in the current series of ids
-                const newId = idArray.reduce((accumulator, id) => {
-                    if (id == accumulator) {
-                        accumulator++ 
-                    } else {
-                        return accumulator;
-                    }
-                },0);
+                // generates new id value. 
+                let idArray = await dao2.allId('SELECT * FROM breeds;'); 
+                // while statement returns the highest missing id value in the current series of ids
+                console.log('idArray: '+  idArray);
+                let count = 1; 
+                while (count === idArray[count-1]) {
+                    count++;
+                }
+                let newId = count; 
                 console.log('new id: ' + newId);
 
                 // insert new record row 
@@ -138,8 +132,8 @@ class BreedRepository {
                     description) VALUES (?,?,?);`, 
                     [newId, object.name, object.description]);
 
-                // check that new record added correctly 
-                return checkForId(newId); 
+                // check that new record added correctly and returns new record
+                return getBreedById(newId); 
             } catch (err) {
                 console.log(err);
             };
@@ -154,12 +148,14 @@ class BreedRepository {
 
         const getProm = async function () {
             try {
-                let isId = checkForId(id);
+                let isId = await checkForId(id);
+                console.log('repo: has it been found? ' + isId);
                 if (!isId) {
                     return null;
                 } else {
-                    await dao2.run('DELETE * FROM breeds WHERE id = ?;', id);
-                    return true; 
+                    let result = await dao2.run('DELETE FROM breeds WHERE breedId = ?;', [id]);
+                    console.log('repo: has it deleted? ' + result);
+                    return result; 
                 }; 
             } catch (err) {
                 console.log(err); 
@@ -169,5 +165,6 @@ class BreedRepository {
     }
 }
 
-module.exports = new BreedRepository(dao);
+module.exports.repository = BreedRepository;
+// export a class by attaching it as a property of the module.exports object 
 
