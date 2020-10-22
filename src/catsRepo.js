@@ -72,7 +72,7 @@ class CatRepository {
                 let isCat = await dao2.get(  
                     'SELECT * FROM cats \ WHERE id = ?;', [id])
             console.log('repo: cat? ' + JSON.stringify(isCat));
-            return JSON.stringify(isCat); 
+            return isCat; 
             }
             } catch (err) {
                 console.log(err); 

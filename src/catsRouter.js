@@ -86,6 +86,7 @@ class CatsRouter {
         this.catsRouter.post('/', this.checkObject, async (req, res, next) => {   
             try {
                 const catWithId = await this.catRepository.addCat(req.object); 
+                console.log('router: ready to return create record ' + catWithId);
                 res.status(201).send(catWithId);  
             } catch (err) {
                 next(err); 
