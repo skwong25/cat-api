@@ -20,8 +20,8 @@ It provided the opportunity to use the [mocha](https://mochajs.org/) framework, 
 
 It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.   
 
-###HowTo  
-## How to use?
+### How To 
+## How To Use
 
 1.  Enter 'npm start' in Terminal. The tab will now read 'node'
 
@@ -92,7 +92,7 @@ curl --location --request PUT 'localhost:4001/cats/VozvVfwm6' \
 curl --location --request DELETE 'localhost:4001/cats/VozvVfwm6'
 
 // No content returned in response to DELETE request 
-
+```
 
 ## Code Style
 
