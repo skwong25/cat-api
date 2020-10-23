@@ -227,11 +227,11 @@ addCat() receives a cat object to be added to the database. It attaches a new un
 
 Non-middleware simple JS functions are held within a separate module from the Router and Repository files. 
 
-These include object check functions, which receive an array of keys, acceptable keys and the request object as arguments. 
+These include object check functions, which receive an array of keys, acceptable keys and the request object as arguments: 
 
-checkObjFormat() rechecks that the passed object is populated.   
-checkObjKeys() checks that the objects keys are valid. Only keys "name", "ageInYears", "favouriteToy" and "description" will be accepted.    
-checkObjValues() checks that the objects values are valid. Only values of 'string' data type (or 'number' for ageInYears) will be accepted.   
+* checkObjFormat() rechecks that the passed object is populated.   
+* checkObjKeys() checks that the objects keys are valid. Only keys "name", "ageInYears", "favouriteToy" and "description" will be accepted.    
+* checkObjValues() checks that the objects values are valid. Only values of 'string' data type (or 'number' for ageInYears) will be accepted.   
 
 All checks return a message string. Unsuccessful checks return a message preprended with Error. 
 The enclosing function checkObj() calls these functions and uses the returned message to determine whether a check has passed or failed: 
@@ -293,10 +293,14 @@ app.use(express.json());
 
 To run all tests, run `npm test` in Terminal. If all tests pass, you will see the screens below:
 
-<img src="./screenshots/testscreenshot1.png" width="450" alt="screenshot7">
+![tests](./screenshots/testscreenshot1.png)
+Format: ![screenshot1](url)
 
-<img src="./screenshots/testsScreenshot2.png" width="450" alt="screenshot7">
-<img src="./screenshots/testsScreenshot3.png" width="450" alt="screenshot7">
+<img src="./screenshots/testscreenshot1.png" width="450" alt="screenshot1">
+
+<img src="./screenshots/testsScreenshot2.png" width="450" alt="screenshot2">
+
+<img src="./screenshots/testsScreenshot3.png" width="450" alt="screenshot3">
 
 ## Unit Tests ##
     
