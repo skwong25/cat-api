@@ -1,5 +1,5 @@
-// class 'CatRepository' serves as a template for creating new cat objects with props & methods
-// the repository class constructor accepts a class instance of the AppDAO object.
+// CatRepository class manages the state of cat objects and exposes methods which should be used to retrieve and create new objects
+// Instantiated in main app.js, takes as dao (data access object) as parameter which manages the database connection
 
 class CatRepository {
     constructor(dao) { 
@@ -7,6 +7,7 @@ class CatRepository {
         this.validate = require('./validationFunctions'); 
         this.dao = dao; 
 
+        // Note that methods that contain neighbouring method calls require binding to the class
         this.getCatById = this.getCatById.bind(this);
         this.addCat = this.addCat.bind(this);
         this.updateCatById = this.updateCatById.bind(this);
@@ -14,20 +15,18 @@ class CatRepository {
         this.checkForId = this.checkForId.bind(this);
     }
 
-    // Note that methods that contain neighbouring method calls require binding to the class
-    // getter & setters no longer required - cat data no longer stored as object properties 
 
     // returns summary array of each cat (id & name) or empty array. 
     getAllCats() {
 
-        // local variable allows access to dao - binding of class method does not also bind nested function! 
+        // local variable allows access to dao - note that binding of class methods does not also bind nested functions
         let dao2 = this.dao; 
         
         const getProm = async function () {
             try {
                 let resolvedValue = await dao2.all('SELECT * FROM cats;')      // await returns returns resolved value of Promise
                 let summaryObj = resolvedValue;                  
-                console.log('repo: cats passed through ok');        
+                console.log('repo: cats received');        
                 return summaryObj;
             } catch (err) {
                 console.log(err); 
@@ -35,8 +34,6 @@ class CatRepository {
         }
         return getProm(); 
     }
-
-    // Note we no longer need to getIndexById to check for a cat id match, because dao.get() can directly retrieve the result set  
 
     // member function: checks for id, returns truthy or falsey
     checkForId(id) { 
@@ -46,7 +43,7 @@ class CatRepository {
         const getProm = async function () {    
             console.log(`repo: checking if cat ${id} exists`);
             try {
-                // await returns resolved value of {id: xxxx} or undefined 
+                // returns resolved value of {id: xxxx} or undefined 
                 let isId = await dao2.get(  
                     'SELECT id FROM cats \ WHERE id = ?;', [id])
                 console.log('repo id check: ' + JSON.stringify(isId));
@@ -104,7 +101,7 @@ class CatRepository {
     }     
 
     // returns updated cat object or null 
-    updateCatById(id, catUpdateObj) { 
+    updateCatById(id, object) { 
 
         let dao2 = this.dao; 
         let checkForId = this.checkForId;  
@@ -116,21 +113,9 @@ class CatRepository {
                 if (!isCat) {
                     return null;
                 } else {
-                    let arr = [];
-                    // creates string of keys & values to be updated
-                    console.log(`catUpdateObj: ${JSON.stringify(catUpdateObj)}`); // Eg: {"name":"Gatty","ageInYears":2}
-                    for(let key in catUpdateObj) {
-                            arr.push(`${key} = '${catUpdateObj[key]}' `); 
-                    } 
-                    console.log(arr) // should be [name = Gatty ,ageInYears = 2] 
-                    let sql = 'UPDATE cats SET ' + arr.join() + 'WHERE id = ?' 
-                    console.log(`repo sql: ${sql}`);
-
-                    // UPDATE cats SET key = 'value' 
-                    // updates (/replaces) record - this might be a problem if the id isn't also included. 
-                    await dao2.run(sql,[id])
+                    let sql = 'UPDATE cats SET name = ?, ageInYears = ?, favouriteToy = ?, description = ? WHERE id = ?' 
+                    await dao2.run(sql,[object.name, object.ageInYears, object.favouriteToy, object.description, id])
                     // fetches record to check its correctly updated
-                    console.log("now we have updated..."); 
                     return getCatById(id);
                 };
             } catch (err) {
@@ -165,8 +150,6 @@ class CatRepository {
         return getProm(); 
     }
 } 
-
-// we can write a function that just checks if an id exists by 'SELECT id' rather than retrieving the entire record. 
 
 module.exports.repository = CatRepository
 // export a class by attaching it as a property of the module.exports object 

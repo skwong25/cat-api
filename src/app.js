@@ -1,6 +1,6 @@
-// note that breedRepo class object also should be instantiated here and passed dao, for consistency. 
-
 // CAT API
+// DAO, Router and Repository classes are instantiated here. DAO starts up the database connection. 
+// Route handlers are called and Routers are mounted. Express server is set up listening.
 
 const buildServer = () => {
 
@@ -70,7 +70,7 @@ const buildServer = () => {
 module.exports = buildServer();   
 
 // How do we verify that request data in PUT/POST requests is a JSON object?
-// The bodyparser recognises JSON and parse it into an object attached to req.body 
+// The bodyparser recognises JSON and parses it into an object attached to req.body 
 // If request data is wrongly formatted, req.body remains empty. This is picked up by 'checkObjKeys' middleware function and generates an error. 
 // Otherwise we can check the constructor attribute:
 // https://stackoverflow.com/questions/11182924/how-to-check-if-javascript-object-is-json

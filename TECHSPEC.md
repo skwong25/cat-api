@@ -37,7 +37,7 @@ Technical requirements:
         
 1.
 Create and populate 'cat' & 'pedigree breed' tables via sqlite in Terminal. 'CREATE TABLE' and so forth....
-Remove list of cats and breed objects from catsRepo.js & breedsRepo.js respectively.  (to be completed later)
+Remove list of cats and breed objects from catsRepo.js & breedsRepo.js respectively.  
 Review if the repositories still need to be classes in this case? 
 Note that 'id' key in tables is to have PRIMARY KEY constraint (needs to be unique)  
          

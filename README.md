@@ -5,20 +5,94 @@
 
 A data repository to manage information about cats and pedigree breeds via the HTTP request-response cycle.
 
-# Getting Started #
+## Getting Started 
 
 If npm is not yet installed (run 'npm -v' in Terminal to check), run 'npm install' to install. 
 Run 'npm start' on Terminal to start the server. 
 
-See section [How To Use](HowTo) to begin sending http requests. 
-See section [Tests](HowToTest) for how to run test suites. 
+See section [How To Use](#how-to) to begin sending http requests. 
+See section [Tests](#how-to-test) for how to run test suites. 
 
-## Motivation
+# Motivation
 
 To create an API with full CRUD functionality to put knowledge of [Javascript](https://www.javascript.com/) and the [ExpressJS](https://expressjs.com/) framework into practice.  
 It provided the opportunity to use the [mocha](https://mochajs.org/) framework, [jest](https://jestjs.io/) and [supertest](https://www.npmjs.com/package/supertest) library for writing unit and integration tests. 
 
-It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.    
+It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.   
+
+###HowTo  
+## How to use?
+
+1.  Enter 'npm start' in Terminal. The tab will now read 'node'
+
+```javascript
+the server is listening for catcalls on port 4001
+```
+2. Open new tab in Terminal. This tab reads 'bash'. 
+3. Enter a curl command request, including parameters / request body as required. 
+4. Response returns in Terminal. The Terminal name prompt indicates that the request-response cycle is finished. Examples below: 
+
+```javascript
+
+// GET all cats request 
+curl --location --request GET 'localhost:4001/cats'
+
+// Response to GET all cats requests - object returned
+{
+    "cats": [
+        {
+            "id": "uKVZvMxhLt",
+            "breedId": 1,
+            "name": "Frank"
+        },
+        {
+            "id": "jAWcE8ooF1",
+            "breedId": 1,
+            "name": "Pancake"
+        },
+        {
+            "id": "gWyGbxF934",
+            "breedId": 2,
+            "name": "Madame Floof"
+        },
+        ...
+    ]
+}
+
+// GET by id request with id parameter 
+curl --location --request GET 'localhost:4001/cats/UFogQKrFW'
+
+// Response to GET by id request. - cat object returned 
+{"id":"voY7MDRYM","name":"Catty","ageInYears":1,"favouriteToy":"grass","description":"buff or tan, skinny, talkative, often found in tall grasses or deep in the bush","breedId":1}
+
+// POST request with request body
+curl --location --request POST 'localhost:4001/cats' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "pakora",
+    "description": "Tabbies have a distinctive '\''M'\'' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail" 
+}'
+
+//  Response to POST request - newly-created cat object with generated id returned 
+{"name":"pakora","description":"Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail","id":"61PmDOQEy"}
+
+// PUT request with id parameter & request body 
+curl --location --request PUT 'localhost:4001/cats/VozvVfwm6' \
+--header 'Content-Type: application/json' \
+--data-raw '{ 
+    "name": "Madame Floof",
+    "ageInYears": 2,
+    "description": "High-society cat with a penchant for velvet and marzipan mice" 
+}' 
+
+// Response to PUT request 
+{"id":"VozvVfwm6","name":"Madame Floof","ageInYears":2,"favouriteToy":null,"description":"High-society cat with a penchant for velvet and marzipan mice","breedId":1}
+
+// DEL request with id parameter
+curl --location --request DELETE 'localhost:4001/cats/VozvVfwm6'
+
+// No content returned in response to DELETE request 
+
 
 ## Code Style
 
@@ -216,7 +290,7 @@ GET /cats 200 193 - 1.414 ms
 app.use(express.json()); 
 ```    
 
-###HowToTest
+### How To Test
 ## Tests
 
 To run all tests, run `npm test` in Terminal. If all tests pass, you will see the screens below:
@@ -273,38 +347,6 @@ describe('GET /cats/:id', function () {
 ```
 
 To run integration test suites (for both cat and breed repositories), run `npm run integration` in Terminal. 
-
-
-###HowTo  
-## How to use?
-
-1.  Enter 'npm start' in Terminal. The tab will now read 'node'
-
-```javascript
-the server is listening for catcalls on port 4001
-```
-2. Open new tab in Terminal. This tab reads 'bash'. 
-3. Enter a curl command request, including parameters / request body as required. 
-4. Response returns in Terminal. The Terminal name prompt indicates that the request-response cycle is finished. Examples below: 
-
-```javascript
-// GET by id request, with id parameter 
-curl --location --request GET 'localhost:4001/cats/UFogQKrFW'
-
-// Response to GET by id request. - cat object returned 
-Susanna-Kwongs-MacBook-Pro:cat api susanna$ curl --location --request GET 'localhost:4001/cats/voY7MDRYM'
-{"id":"voY7MDRYM","name":"Catty","ageInYears":1,"favouriteToy":"grass","description":"buff or tan, skinny, talkative, often found in tall grasses or deep in the bush","breedId":1}Susanna-Kwongs-MacBook-Pro:cat api susanna$ 
-
-
-// POST request, with request body
-curl --location --request POST 'localhost:4001/cats' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "name": "pakora",
-    "description": "Tabbies have a distinctive '\''M'\'' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail" '}
-
-//  Response to POST request - newly-created cat object with generated id returned 
-{"name":"pakora","description":"Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail","id":"61PmDOQEy"}Susanna-Kwongs-MacBook-Pro:cat api susanna$ 
 
 ## Credits
 

@@ -1,9 +1,5 @@
-// ids:
-// {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
-
 const request = require('supertest');
 const should = require('should');
-
 const appTest = require('../src/app'); 
 
 //==================== user API tests ====================
@@ -15,8 +11,9 @@ describe('GET /cats', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(function (res) {
-                let object = JSON.stringify(res.body); // Note that this parsing from JSON to JS object - only allows us to console log result 
-                console.log("object: " + object);    // {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
+                 // Note that this parsing from JSON to JS object - only allows us to console log result 
+                let object = JSON.stringify(res.body);
+                console.log("object: " + object);   
                 res.body.cats[0].should.have.property('id');
                 res.body.cats[0].should.have.property('name','Frank');
             })
@@ -42,7 +39,6 @@ describe('GET /cats/:id', function () {
     });
 });
 
-
 describe('GET /cats/:id', function () {
     it('respond with 404 id not found', function (done) {
         request(appTest)
@@ -66,7 +62,7 @@ describe('GET /cats/:id', function () {
             .expect(400) 
             .expect("'NaN' is not a valid shortid") 
             .end((err) => {
-                if (err) return done(err); // this error is a TEST ASSERTION ERROR
+                if (err) return done(err); // Note that this error would be a TEST ASSERTION ERROR
                 done();                    // not the error thrown in our code 
             });
     });
@@ -138,21 +134,6 @@ describe('PUT /cats/:id', function () {
 
 describe('DEL /cats/:id', function () {
 
-/*
-// commented out the successful delete test
-// should come up with a sustinable alternative to test the delete function 
-
-    it('successfully deletes record, respond with 204 no content', function (done) {
-        request(appTest)
-            .delete('/cats/oASLxZgfR')
-            .expect(204)
-            .end((err) => {
-                if (err) return done(err); 
-                done(); 
-            })    
-    });
-*/
-
     it('respond with 404 id not found', function (done) {
         request(appTest)
             .delete('/cats/oc12C0X3-h')
@@ -187,7 +168,6 @@ describe('POST /cats', function () {
     }
 
     const empty = {
-
     }
     
     it('respond with 201 content created - successfully creates new cat object with new id', function (done) {

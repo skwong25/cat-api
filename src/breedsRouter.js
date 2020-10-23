@@ -1,10 +1,11 @@
 // Breed routers (only contains middleware functions)
 
+// Note on middleware and error-handling parameters: 
 // MIDDLEWARE FUNCTIONS PATTERN: Execution ends with next() or next(err) 
+// ERROR HANDLING PATTERN: 404 errors take an 'unfound id' param // 400 errors take an 'error message' param
+// const err = validate.generateErr404(id); 
+// const err = validate.generateErr400(errMessage); 
 
-// ERROR HANDLING PATTERN: 404 errors take an 'unfound id' param // 400 errors take an 'error message' param 
-//  const err = validate.generateErr(errMessage); 
-//  return next(err); 
 class BreedsRouter {
     constructor (breedsRepository) {
         this.express = require('express');  
@@ -55,9 +56,11 @@ class BreedsRouter {
 
     initializeRoutes() {
 
+        // note that we re-declare variables to allow access to class methods within the local scope 
+        // alternative solutions tested:
         // tried to bind this.breedsRepository in the constructor: 'TypeError: this.breedsRepository.bind is not a function'
         // tried also to bind this.breedsRouter in the constructor but it could not access this.breedsRepository or this.validate still
-        // only solution is to declare in local scope: 
+
         let breedsRepository = this.breedsRepository; 
         let validate = this.validate; 
 
@@ -66,7 +69,7 @@ class BreedsRouter {
             try {
                 const breeds = await breedsRepository.getAllBreeds(); // this returns an array of objects
                 console.log(breeds);  
-                res.json({"breeds": breeds});
+                res.json({breeds: breeds});
             } catch (err) {
                 next(err); 
             };

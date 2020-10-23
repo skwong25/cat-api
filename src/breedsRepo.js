@@ -1,34 +1,17 @@
-// class 'BreedRepository' serves as a template for creating new breed objects with props & methods
-// the repository class constructor accepts a class instance of the AppDAO object, to allow dao methods. 
-
-/*
-// data now persisted in SQLite db: 
-this.breeds = [
-        {
-        breedId: 1,
-        name: "tabby",
-        description: "Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail"
-        },
-        {
-        breedId: 2,
-        name: "turkish angora",
-        description: "Turkish Angoras are one of the ancient, natural breeds of cat, having originated in central Turkey dated as far back as the 17th century, in the Ankara region."
-        }
-    ]
-*/
+// BreedRepository class manages the state of breed objects and exposes methods which should be used to retrieve and create new objects
+// Instantiated in main app.js, takes as dao (data access object) as parameter which manages the database connection
 
 class BreedRepository {
     constructor(dao) {
         this.dao = dao; 
 
+        // Note that methods used in/containing neighbouring method calls require binding to the class
         this.checkForId = this.checkForId.bind(this);
         this.getBreedById = this.getBreedById.bind(this);
     }
-    // Note that methods used in/containing neighbouring method calls require binding to the class
 
     // returns a summary list of breed objects 
     getAllBreeds() {
-        console.log('repo dao:' + this.dao); 
         const dao2 = this.dao;
         const getProm = async function () {
             try {
@@ -41,11 +24,9 @@ class BreedRepository {
         return getProm();
     }
 
-    // member function used in updateBreedById and deleteBreedById - returns true or false 
+    // returns true or false (member function called in updateBreedById and deleteBreedById)
     checkForId(id) {
-
         const dao2 = this.dao;
-
         const getProm = async function () {
             try {
                 const isId = await dao2.get('SELECT breedId FROM breeds WHERE breedId = ?;', [id]);
@@ -59,7 +40,7 @@ class BreedRepository {
     }
 
     getBreedById(id) {
-
+        // note that we re-declare function variables for each method to allow access within local scope  
         const dao2 = this.dao;
         const checkForId = this.checkForId; 
 
@@ -89,15 +70,8 @@ class BreedRepository {
                 if (!checkForId(id)) {
                     return null;
                 } else {
-                    // iterates through object to create a string of keys and values in format: 'column = value column2 = value2'
-                    let arr = []; 
-                    console.log('object:' + JSON.stringify(object));
-                    for (let key in object) {
-                        arr.push(` ${key} = '${object[key]}'`);   
-                    }
-                    console.log('arr: ' + arr); 
-                    let sql = `UPDATE breeds SET ${arr.join()} WHERE breedId = ?;`
-                    await dao2.run(sql,[id]);
+                    let sql = `UPDATE breeds SET name = ?, description = ? WHERE breedId = ?;`
+                    await dao2.run(sql,[object.name, object.description, id]);
                     let checkNewRecord = getBreedById(id);  
                     return checkNewRecord; 
                 };
@@ -117,7 +91,8 @@ class BreedRepository {
             try {
                 // generates new id value. 
                 let idArray = await dao2.allId('SELECT * FROM breeds;'); 
-                // while statement returns the highest missing id value in the current series of ids
+                // 'while' statement returns highest missing id value in the current series of ids
+                // its noted that SQLite's implicit rowid column is auto-incrementing which could replace below code 
                 console.log('idArray: '+  idArray);
                 let count = 1; 
                 while (count === idArray[count-1]) {
@@ -132,7 +107,6 @@ class BreedRepository {
                     description) VALUES (?,?,?);`, 
                     [newId, object.name, object.description]);
 
-                // check that new record added correctly and returns new record
                 return getBreedById(newId); 
             } catch (err) {
                 console.log(err);

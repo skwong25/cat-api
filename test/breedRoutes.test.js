@@ -1,12 +1,10 @@
 // API integration tests for '/breed routes'
-// (testing middleware functions in isolation would mean we dont need to test every case for the route tests - only success cases)
 
 const request = require('supertest');
 const should = require('should');
-
 const appTest = require('../src/app'); 
 
-//  The function passed as second argument to it() can be passed an optional callback function as its first argument. 
+// The function passed as second argument to it() can be passed an optional callback function as its first argument. 
 // When this callback function 'done' is passed, Mocha knows that the test is for asynchronous functionality.
 // (so all of our tests below are asynchronous code!)
 // https://blog.logrocket.com/a-quick-and-complete-guide-to-mocha-testing-d0e0ea09f09d/ 
@@ -39,7 +37,7 @@ describe('GET /breeds', function () {
             .expect((res) => {
                 let firstBreed = res.body.breeds[0];
                 let secondBreed = res.body.breeds[1];
-                firstBreed.should.have.property('breedId', 1);
+                firstBreed.should.have.property('breedId', 1);      
                 firstBreed.should.have.property('name', 'tabby');
                 secondBreed.should.have.property('breedId', 2);
                 secondBreed.should.have.property('name', 'turkish angora');
@@ -61,7 +59,7 @@ describe('GET /breeds/:breedId', function () {
 
             .expect((res) => {
                 let breedObject = res.body; 
-                breedObject.should.have.property('breedId', 1);
+                breedObject.should.have.property('breedId', 1);    
                 breedObject.should.have.property('name', 'tabby');
                 breedObject.should.have.property('description');
             })
@@ -169,7 +167,7 @@ describe('PUT /breeds/:breedId', function () {
         request(appTest)
             .put('/breeds/9')
             .send(emptyObj)
-            .set('Accept', "text/html; charset=utf-8") // what is the diff between .set and .expect ? 
+            .set('Accept', "text/html; charset=utf-8") 
             .expect('Content-Type', "text/html; charset=utf-8")
             .expect(400, 'Error: Request data is not a valid object. ')
             .end((err) => {
@@ -188,7 +186,7 @@ describe('POST /breeds', function () {
             .expect(201)
             .expect((res) => {
                 let newBreed = res.body;
-                newBreed.should.have.property('breedId', 4);
+                newBreed.should.have.property('breedId', 4);  
                 newBreed.should.have.property('name', 'norwegian mountain cat');
                 newBreed.should.have.property('description', 'Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
             })

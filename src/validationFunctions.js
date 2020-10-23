@@ -1,4 +1,3 @@
-
 // SIMPLE JS FUNCTIONS:
 
 // isInvalidString() checks the data type of a passed argument. Returns a truthy in the event of a non-string. Else, returns falsey. 
@@ -32,7 +31,6 @@ function generateErr404(id) {
 
 // checks for a populated object 
 function checkObjFormat(keys) { 
-    console.log(`keys: ${keys}`);
     let message = (keys.length !== 0) ? 
         'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
     return message; 
@@ -40,7 +38,7 @@ function checkObjFormat(keys) {
 
 // checks for valid keys 
 function checkObjKeys(keys, object, validKeys) {
-    let invalidKeys = keys.filter((key) => {  // returns condition 
+    let invalidKeys = keys.filter((key) => {  
         return !validKeys.includes(key);
     });
     let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
@@ -71,6 +69,6 @@ module.exports = {
     checkObjValues,
 }   
 
-// This outputs: { function1: [Function: getUser], function2: [Function: getUsers] }
+// This export object outputs: { getUser: [Function: getUser], getUsers: [Function: getUsers] }
 // This common pattern for JS developers is called the revealing module pattern - giving us function names and documents API clearly at end of the file. 
 // https://stackify.com/node-js-module-exports/
