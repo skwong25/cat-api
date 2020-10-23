@@ -1,16 +1,6 @@
-// next we will write an API test for '/breed routes' GET and GET by id: 
-
 const request = require('supertest');
 const should = require('should');
-
-const buildServer = require('../src/app'); 
-const generateTestId = {
-    generate() {
-        return "tmk60ux2b" 
-    } 
-}
-
-const appTest = buildServer(generateTestId);
+const appTest = require('../src/app'); 
 
 //==================== user API tests ====================
 
@@ -21,10 +11,11 @@ describe('GET /cats', function () {
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(function (res) {
-                let object = JSON.stringify(res.body); // Note that this parsing from JSON to JS object - only allows us to console log result 
-                console.log("object: " + object);    // {"cats":[{"id":"1c2A5dmtr","name":"Catty"},{"id":"uKVZvMxhLt","name":"Frank"},{"id":"jAWcE8ooF1","name":"Pancake"},{"id":"gWyGbxF934","name":"Madame Floof"}]}
+                 // Note that this parsing from JSON to JS object - only allows us to console log result 
+                let object = JSON.stringify(res.body);
+                console.log("object: " + object);   
                 res.body.cats[0].should.have.property('id');
-                res.body.cats[0].should.have.property('name','Catty');
+                res.body.cats[0].should.have.property('name','Frank');
             })
             .expect(200)
             .end((err) => {
@@ -37,7 +28,7 @@ describe('GET /cats', function () {
 describe('GET /cats/:id', function () {
     it('respond with json object containing detailed information on a single cat', function (done) {
         request(appTest)
-            .get('/cats/tmk60ux2b')
+            .get('/cats/uKVZvMxhLt')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
@@ -47,7 +38,6 @@ describe('GET /cats/:id', function () {
             })    
     });
 });
-
 
 describe('GET /cats/:id', function () {
     it('respond with 404 id not found', function (done) {
@@ -72,7 +62,7 @@ describe('GET /cats/:id', function () {
             .expect(400) 
             .expect("'NaN' is not a valid shortid") 
             .end((err) => {
-                if (err) return done(err); // this error is a TEST ASSERTION ERROR
+                if (err) return done(err); // Note that this error would be a TEST ASSERTION ERROR
                 done();                    // not the error thrown in our code 
             });
     });
@@ -90,6 +80,12 @@ describe('PUT /cats/:id', function () {
         "favouriteToy": "grass"
     }
 
+    const underdueBirthday = {
+        "name": "Catty",
+        "ageInYears": 1,
+        "favouriteToy": "grass"
+    }
+
     const falseBirthday = {
         "name": "Catty",
         "ageInYears": "two",
@@ -98,8 +94,21 @@ describe('PUT /cats/:id', function () {
 
     it('responds with 200  - successfully updates records', function (done) {
         request(appTest)
-            .put('/cats/tmk60ux2b')
+            .put('/cats/o6qjxIQAV')
             .send(overdueBirthday)
+            .set('Accept', "text/html; charset=utf-8")
+            .expect('Content-Type', /json/)  
+            .expect(200)
+            .end((err) => {
+                if (err) return done(err); 
+                done(); 
+            })    
+    }); 
+
+    it('responds with 200  - successfully updates records', function (done) {
+        request(appTest)
+            .put('/cats/o6qjxIQAV')
+            .send(underdueBirthday)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', /json/)  
             .expect(200)
@@ -123,23 +132,14 @@ describe('PUT /cats/:id', function () {
     });  
 })
 
-describe('DEL /cats/:id - successfully deletes record', function () {
-    it('respond with 204 no content', function (done) {
-        request(appTest)
-            .delete('/cats/tmk60ux2b')
-            .expect(204)
-            .end((err) => {
-                if (err) return done(err); 
-                done(); 
-            })    
-    });
+describe('DEL /cats/:id', function () {
 
     it('respond with 404 id not found', function (done) {
         request(appTest)
-            .delete('/cats/oc12C0X3-g')
+            .delete('/cats/oc12C0X3-h')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, `id 'oc12C0X3-g' not found in database`)
+            .expect(404, `id 'oc12C0X3-h' not found in database`)
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -149,7 +149,7 @@ describe('DEL /cats/:id - successfully deletes record', function () {
 
 describe('POST /cats', function () {
 
-    const body = {
+    const validBody = {
         "name": "JimJam",
         "ageInYears": 5,
         "favouriteToy": "amazing technicolour dreamcoat"
@@ -168,22 +168,22 @@ describe('POST /cats', function () {
     }
 
     const empty = {
-
     }
     
     it('respond with 201 content created - successfully creates new cat object with new id', function (done) {
         request(appTest)
             .post('/cats')
-            .send(body)
+            .send(validBody)
             .set('Accept', 'application/x-www-form-urlencoded')
             .expect('Content-Type', /json/)                                    
             .expect(function (res) {
                 let object = JSON.stringify(res.body);  
                 console.log("object: " + object);    
-                res.body.name.should.equal('JimJam');
-                res.body.ageInYears.should.equal(5);
-                res.body.favouriteToy.should.equal('amazing technicolour dreamcoat');
+                res.body.should.have.property('name','JimJam');
+                res.body.should.have.property('ageInYears',5);
+                res.body.should.have.property('favouriteToy','amazing technicolour dreamcoat');
                 res.body.should.have.property('id');
+                res.body.should.have.property('breedId');
             })
             .expect(201)   
             .end((err) => {

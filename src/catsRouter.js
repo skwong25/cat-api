@@ -10,7 +10,7 @@ class CatsRouter {
         this.isIdValid = this.isIdValid.bind(this);     
         this.checkObject = this.checkObject.bind(this); 
     }
-    // Note that methods that contain neighbouring method calls require binding to the class
+    // Note that methods that are CALLED in neighbouring methods require binding to the class 
 
     // checks if id is a valid shortid                          
     isIdValid(req, res, next) {  
@@ -28,11 +28,12 @@ class CatsRouter {
         };
     }
 
-    // consolidates Object checks: Each check function returns Error or Success message - those prepended with "Error.." are passed onto generate error. 
-
+    // checkobject consolidates Object checks: 
+    // each check function returns Error or Success message - those prepended with "Error.." are passed onto generate error. 
     checkObject(req, res, next) { 
 
-        const object = req.body;  // JSON bodyparses attaches parsed object to req.body so no need to check: typeof object === "object" 
+        // As JSON bodyparses attaches parsed object to req.body, so no need to check object type: typeof object === "object" 
+        const object = req.body; 
         const keys = Object.keys(object);
         const validKeys = ["name", "ageInYears", "favouriteToy", "description"];
         let arrayOfFunctions = [this.validate.checkObjFormat, this.validate.checkObjKeys, this.validate.checkObjValues];
@@ -47,56 +48,80 @@ class CatsRouter {
                 console.log(message);
             };
         });
-    req.object = object;  // reassignment of req.body to req.object is another check that its successfully passed this check 
-    next()
+        req.object = object;  
+        next()
     }
     
     initializeRoutes() {
 
         // GET route all 
-        this.catsRouter.get('/', (req, res, next) => {  
-            const cats = this.catRepository.getAllCats();  
-            res.json({"cats": cats}); 
+        this.catsRouter.get('/', async (req, res, next) => {  
+            try {
+                // await returns the resolved value of the Promise
+                let cats = await this.catRepository.getAllCats(); 
+                console.log(`router: got em!`);  
+                res.json({"cats": cats});
+                // res.json sends a json response
+            } catch (err) {
+                next(err);
+            }   
         });
 
         // GET route by id 
-        this.catsRouter.get('/:id', this.isIdValid, (req, res, next) => {  
-            // getCatById returns cat object or null 
-            const foundCat = this.catRepository.getCatById(req.id);         
-            if (foundCat) { 
-                console.log('cat retrieved:' + foundCat);
-                res.send(foundCat);
-            } else {
-                return next(this.validate.generateErr404(req.id))
+        this.catsRouter.get('/:id', this.isIdValid, async (req, res, next) => { 
+            try { 
+                // getCatById returns cat object or null 
+                const foundCat = await this.catRepository.getCatById(req.id);         
+                if (foundCat) { 
+                    console.log('router: cat retrieved ' + foundCat);
+                    res.send(foundCat);
+                } else {
+                    return next(this.validate.generateErr404(req.id))
+                }
+            } catch (err) {
+                next(err)
             }
         });
 
         // POST route 
-        this.catsRouter.post('/', this.checkObject, (req, res, next) => {   
-            const catWithId = this.catRepository.addCat(req.object); 
-            res.status(201).send(catWithId);  
+        this.catsRouter.post('/', this.checkObject, async (req, res, next) => {   
+            try {
+                const catWithId = await this.catRepository.addCat(req.object); 
+                console.log('router: ready to return create record ' + catWithId);
+                res.status(201).send(catWithId);  
+            } catch (err) {
+                next(err); 
+            }
         });
 
         // PUT route - allows user to add/update information by id
-        this.catsRouter.put('/:id', this.isIdValid, this.checkObject, (req, res, next) => {
+        this.catsRouter.put('/:id', this.isIdValid, this.checkObject, async (req, res, next) => {
             // updateCatById returns updated cat object or null 
-            const isUpdated = this.catRepository.updateCatById(req.id, req.object);            
-            if (isUpdated) {
-                console.log(`cat id '${req.id}' successfully updated`)
-                res.send(isUpdated); 
-            } else {
-                return next(this.validate.generateErr404(req.id))
+            try {
+                const isUpdated = await this.catRepository.updateCatById(req.id, req.object);            
+                if (isUpdated) {
+                    console.log(`cat id '${req.id}' successfully updated`)
+                    res.send(isUpdated); 
+                } else {
+                    return next(this.validate.generateErr404(req.id))
+                }
+            } catch (err) {
+                next(err);
             }
         });
 
         // DEL route
-        this.catsRouter.delete('/:id', this.isIdValid, (req, res, next) => {
-            // updateCatById returns updated cat object or null 
-            const isDeleted = this.catRepository.deleteCatById(req.id); 
-            if (isDeleted) {
-                res.status(204).send(); // 204 NO CONTENT 
-            } else {
-                return next(this.validate.generateErr404(req.id))
+        this.catsRouter.delete('/:id', this.isIdValid, async (req, res, next) => {
+            // deleteCatById returns true (deleted) or null 
+            try {
+                const isDeleted = await this.catRepository.deleteCatById(req.id); 
+                if (isDeleted) {
+                    res.status(204).send(); // 204 NO CONTENT 
+                } else {
+                    return next(this.validate.generateErr404(req.id))
+                }
+            } catch (err) {
+                next(err); 
             }
         });
     }

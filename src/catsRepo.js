@@ -1,126 +1,153 @@
-// class 'CatRepositoryClass' serves as a template for creating new cat objects with props & methods
-// example of dependancy injection:
+// CatRepository class manages the state of cat objects and exposes methods which should be used to retrieve and create new objects
+// Instantiated in main app.js, takes as dao (data access object) as parameter which manages the database connection
 
 class CatRepository {
-    constructor(idGenerator) { 
-        console.log("idGenerator passed in: " + idGenerator);
-        this.generateId = idGenerator; 
-        console.log("this.generateId: " + this.generateId);
-        this.cats = [
-            {   
-                id: this.generateId(),  // TypeError: this.generateId is not a function
-                name: "Catty",
-                ageInYears: 1,
-                favouriteToy: "grass",
-                description: "buff or tan, skinny, talkative, often found in tall grasses or deep in the bush",
-                breedId: 1
-            },
-            {
-                id: this.generateId(),
-                name: "Frank",
-                ageInYears: 5,
-                favouriteToy: "flies",
-                description: "orange, heavy-set, non-responsive except to neck scratches",
-                breedId: 1
-            },
-            {
-                id: this.generateId(),
-                name: "Pancake",
-                ageInYears: 4,
-                favouriteToy: "pavement",
-                description: "brown, heavy-set, spent life behind bars",
-                breedId: 1
-            },
-            {
-                id: this.generateId(),
-                name: "Madame Floof",
-                ageInYears: 1,
-                favouriteToy: "ball",
-                description: "white dark patches on legs, kerbside, fluffy dustbuster tail",
-                breedId: 2
-            },
-        ];
+    constructor(dao) { 
+        this.shortid = require('shortid');
+        this.validate = require('./validationFunctions'); 
+        this.dao = dao; 
+
+        // Note that methods that contain neighbouring method calls require binding to the class
+        this.getCatById = this.getCatById.bind(this);
+        this.addCat = this.addCat.bind(this);
+        this.updateCatById = this.updateCatById.bind(this);
+        this.deleteCatById = this.deleteCatById.bind(this);
+        this.checkForId = this.checkForId.bind(this);
     }
 
-    get getCats() {
-        return this.cats // returns [{},{},{}]
-    }
-    
-    set setCats(catsCopy) {
-        this.cats = catsCopy; 
-    }
 
-    // returns summary object of each cat. 
+    // returns summary array of each cat (id & name) or empty array. 
     getAllCats() {
-        const catCopy = this.getCats;  
-        console.log("Copied cat array from database"); 
-        const summaryArray = catCopy.map((object) => {
-            return {
-                id: object['id'],   
-                name: object['name']
-            }
-        });
-        console.log(`Array of cat summary objects: ${summaryArray}`);
-        return summaryArray;
+
+        // local variable allows access to dao - note that binding of class methods does not also bind nested functions
+        let dao2 = this.dao; 
+        
+        const getProm = async function () {
+            try {
+                let resolvedValue = await dao2.all('SELECT * FROM cats;')      // await returns returns resolved value of Promise
+                let summaryObj = resolvedValue;                  
+                console.log('repo: cats received');        
+                return summaryObj;
+            } catch (err) {
+                console.log(err); 
+            }                                     
+        }
+        return getProm(); 
     }
 
-    // updates database with new cat record 
-    // assigns id, adds cat to copy of existing array, reassigns to class object 
-    addCat(newCat) {
-        newCat.id = this.generateId();            
-        let catsCopy = this.getCats;         
-        catsCopy.push(newCat);             
-        this.setCats = catsCopy;          
-        return newCat                    
-    } 
-    
-    // checks database for cat id match, returns index or -1  
-    getIndexById(id) { 
-        const catArray = this.getCats;       
-        return catArray.findIndex(cat => {       
-            return cat.id == id;                         
-        }); 
+    // member function: checks for id, returns truthy or falsey
+    checkForId(id) { 
+
+        let dao2 = this.dao; 
+
+        const getProm = async function () {    
+            console.log(`repo: checking if cat ${id} exists`);
+            try {
+                // returns resolved value of {id: xxxx} or undefined 
+                let isId = await dao2.get(  
+                    'SELECT id FROM cats \ WHERE id = ?;', [id])
+                console.log('repo id check: ' + JSON.stringify(isId));
+                return isId ? true : false;
+            } catch (err) {
+                console.log(err); 
+            } 
+        }
+        return getProm();  
     } 
 
     // returns cat object or null 
     getCatById(id) {
-        const foundIndex = this.getIndexById(id);
-        if (foundIndex === -1) {
-            return null;
-        } else {
-        return this.cats[foundIndex]; 
+
+        let dao2 = this.dao; 
+        let checkForId = this.checkForId; 
+
+        const getProm = async function () {
+            try { 
+            if (!checkForId(id)) { 
+                return null;
+            } else {
+                let isCat = await dao2.get(  
+                    'SELECT * FROM cats \ WHERE id = ?;', [id])
+            console.log('repo: cat? ' + JSON.stringify(isCat));
+            return isCat; 
+            }
+            } catch (err) {
+                console.log(err); 
+            } 
         }
+        return getProm(); 
     }
+
+    // assigns id + updates database with new cat record 
+    addCat(newCat) {  
+
+        let dao2 = this.dao; 
+        let getCatById = this.getCatById; 
+        const newId = this.shortid.generate(); 
+
+        let getProm = async function () {
+            try {
+                await dao2.run(
+                    'INSERT INTO cats (id, name , ageInYears, favouriteToy, description) \
+                    VALUES (?,?,?,?,?)',
+                    [newId, newCat.name , newCat.ageInYears, newCat.favouriteToy, newCat.description]
+                ); 
+                return getCatById(newId); 
+            } catch (err) {
+                console.log(err); 
+            } 
+        } 
+        return getProm();                
+    }     
 
     // returns updated cat object or null 
-    updateCatById(id, catUpdateObj) {
-        const foundIndex = this.getIndexById(id); 
-        if (foundIndex === -1) {
-            return null;
-        } else {
-            let catsCopy = this.getCats;
-            for (let key in catUpdateObj) {
-                if (catUpdateObj[key] !== catsCopy[foundIndex][key]) {    // ensures that if a value is the same, it won't be updated 
-                    catsCopy[foundIndex][key] = catUpdateObj[key];
-                    console.log(`updated: ${key} = ${catsCopy[foundIndex][key]}`);
-                }
+    updateCatById(id, object) { 
+
+        let dao2 = this.dao; 
+        let checkForId = this.checkForId;  
+        let getCatById = this.getCatById; 
+
+        let getProm = async function () {
+            try {
+                let isCat = await checkForId(id);  
+                if (!isCat) {
+                    return null;
+                } else {
+                    let sql = 'UPDATE cats SET name = ?, ageInYears = ?, favouriteToy = ?, description = ? WHERE id = ?' 
+                    await dao2.run(sql,[object.name, object.ageInYears, object.favouriteToy, object.description, id])
+                    // fetches record to check its correctly updated
+                    return getCatById(id);
+                };
+            } catch (err) {
+                console.log(err); 
             }
-            this.setCats = catsCopy; 
-            return catsCopy[foundIndex];
-        };
+        }
+        return getProm(); 
     }
 
-    // returns deleted cat object or null 
+    // returns true or null 
     deleteCatById(id) {
-        const foundIndex = this.getIndexById(id);
-        if (foundIndex === -1) {
-            return null;
-        } else {
-            let catsCopy = this.getCats;
-            const catRemoved = catsCopy.splice(foundIndex, 1);
-            this.setCats = catsCopy; 
-            return catRemoved;
-        };
+
+        let dao2 = this.dao; 
+        let checkForId = this.checkForId; 
+
+        const getProm = async function () {
+            try {
+                let outcome = await checkForId(id)
+                if ( outcome === false) {
+                    console.log('repo: cat not found')
+                    return null;
+                } else {
+                    let isCat = await dao2.run(
+                        'DELETE FROM cats \ WHERE id = ?', [id])
+                    console.log(`repo: cat ${id} deleted`);
+                    return true; 
+                };
+            } catch (err) {
+                console.log(err); 
+            }
+        }
+        return getProm(); 
     }
 } 
 
@@ -130,4 +157,5 @@ module.exports.repository = CatRepository
 
 // Note that if a module is imported multiple times, but with the same specifier (i.e. path), 
 // the JavaScript specification guarantees that you’ll receive the same module instance. 
-// Above, we should expect that although the class instance is imported in app.js AND catsRouter, it will be the same instance. 
+// Above, we should expect that although the class object is imported in app.js AND catsRouter, it will be the same instance. 
+// However, if it is instantiated in two separate places it will be two separate class instances. 

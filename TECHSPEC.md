@@ -37,12 +37,13 @@ Technical requirements:
         
 1.
 Create and populate 'cat' & 'pedigree breed' tables via sqlite in Terminal. 'CREATE TABLE' and so forth....
-Remove list of cats and breed objects from catsRepo.js & breedsRepo.js respectively.   
+Remove list of cats and breed objects from catsRepo.js & breedsRepo.js respectively.  
 Review if the repositories still need to be classes in this case? 
 Note that 'id' key in tables is to have PRIMARY KEY constraint (needs to be unique)  
          
 2. 
-Install sqlite3 node module into the root directory of cat api. Import/require sqlite3 into repository files for use.
+Install sqlite3 node module into the root directory of cat api. This should now appear as a dependancy in package.json. 
+Import/require sqlite3 into repository files for use.
 
 We will create a DAO (Data Access Object) which contains a class AppDAO that...
 1. starts up database connection upon class instantiation:  
@@ -93,34 +94,69 @@ GET BY ID - returns a single row
     (db.get deals with a single row result set)
     callback > returns the object 
 
-DEL BY ID - returns no content
+DEL BY ID - deletes row, returns no content
     db.run DELETE FROM table WHERE id = ? 
+
+POST - adds row of data, returns updated object 
+    Use db.serialise() wrapper to run: (ensures synchronous execution)
+    db.run INSERT INTO table (key, key, key) VALUES (?,?,?); 
+    db.get SELECT * FROM table WHERE id = ?;  
                     
-PUT BY ID - return updated object
+PUT BY ID - updates row of data, returns updated object
     Use db.serialise() wrapper to run: (ensures synchronous execution)
     db.run UPDATE table SET keyToBeUpdated = value WHERE id = ?
     db.get SELECT * FROM table WHERE id = ?;              
-
-Note: As likely updating lots of values, not just one, we may have to use a [Conditional Update](https://stackoverflow.com/questions/20255138/sql-update-multiple-records-in-one-query):  
+    We can update lots of values as per following syntax: 
                     
 ```sql
-                        UPDATE config
-                        SET config_value = CASE config_name 
-                                    WHEN 'name1' THEN 'value' 
-                                    WHEN 'name2' THEN 'value2' 
-                                    ELSE config_value
-                                    END
-                        WHERE config_name IN('name1', 'name2');
-                        WHERE config_name IN('name1', 'name2');
-                    
-                    
-            POST -  return updated object
-                    The addCat() method will need to pass a generated id as parameter to the database connector function.  
-                    Use db.serialise() wrapper to run:
-                        db.run INSERT INTO table ([arrayOfKeys]) VALUES ([arrayOfValuesToBeUpdated]); 
-                        db.get SELECT * FROM table WHERE id = ?;  
+    UPDATE table
+        SET column_1 = new_value_1,
+        column_2 = new_value_2
+    WHERE
+        search_condition 
+    ORDER column_or_expression
+    LIMIT row_count OFFSET offset;
         
 ```
+However we also need a [check](https://stackoverflow.com/questions/6677517/update-if-different-changed), to ensure values which are the same (or non-existant) in the new object are not updated. 
+
+```sql
+    UPDATE table1 
+        SET col1 = 'hello' 
+        WHERE id = ? AND col1 <> 'hello'
+```
+This heavyweight solution would need to filter through ALL the columns. Non-equality predicates are not able to use index seeks. 
+Better solution using EXIST & EXCEPT clauses. We want to compare the values in the destination row to the values in the matching source row to determine if an update is needed, to avoid net zero changes. 
+
+```sql
+update cats
+   set name = ?,
+       ageInYears = ?,
+       favouriteToy = ?,
+       description = ?
+where id IS ?
+  and exists 
+    (
+    select catUpdates.name
+           catUpdates.ageInYears
+           catUpdates.description
+    except
+    select cats.name,
+           cats.ageInYears,
+           cats.description           ,
+      from catUpdates
+     where cats.id = catUpdates.id
+    )
+```
+// 1. get record row and compare. 
+const body = {
+        "name": "JimJam",
+        "ageInYears": 5,
+        "favouriteToy": "amazing technicolour dreamcoat"
+    } 
+// we can 'iterate' through the keys
+// how can we make an UPDATE command that only updates the object keys we give it? 
+// in this case, we have to offer it two results set rows
 
 6. 
 The SIGTERM event is emitted when the Node application is manually exited via Ctrl-C:

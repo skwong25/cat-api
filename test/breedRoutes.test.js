@@ -1,19 +1,10 @@
 // API integration tests for '/breed routes'
-// (testing middleware functions in isolation would mean we dont need to test every case for the route tests - only success cases)
 
 const request = require('supertest');
 const should = require('should');
+const appTest = require('../src/app'); 
 
-const buildServer = require('../src/app'); 
-const generateTestId = {
-    generate() {
-        return "tmk60ux2b" 
-    } 
-}
-    
-const appTest = buildServer(generateTestId);
-
-//  The function passed as second argument to it() can be passed an optional callback function as its first argument. 
+// The function passed as second argument to it() can be passed an optional callback function as its first argument. 
 // When this callback function 'done' is passed, Mocha knows that the test is for asynchronous functionality.
 // (so all of our tests below are asynchronous code!)
 // https://blog.logrocket.com/a-quick-and-complete-guide-to-mocha-testing-d0e0ea09f09d/ 
@@ -38,7 +29,7 @@ const appTest = buildServer(generateTestId);
 
 
 describe('GET /breeds', function () {
-    it('respond with json object containing a list of all breeds - minimum 2 records to start', function (done) {
+    it('respond with json object containing a list of all breeds listing breedId & name', function (done) {
         request(appTest)
             .get('/breeds')
             .set('Accept', 'application/json')
@@ -46,12 +37,10 @@ describe('GET /breeds', function () {
             .expect((res) => {
                 let firstBreed = res.body.breeds[0];
                 let secondBreed = res.body.breeds[1];
-                firstBreed.should.have.property('breedId', 1);
+                firstBreed.should.have.property('breedId', 1);      
                 firstBreed.should.have.property('name', 'tabby');
-                firstBreed.should.have.property('description', "Tabbies have a distinctive 'M' shaped marking on their forehead, stripes by their eyes and across their cheeks, along their back, and around their legs and tail");
                 secondBreed.should.have.property('breedId', 2);
                 secondBreed.should.have.property('name', 'turkish angora');
-                secondBreed.should.have.property('description', 'Turkish Angoras are one of the ancient, natural breeds of cat, having originated in central Turkey dated as far back as the 17th century, in the Ankara region.');
             })
             .expect(200)
             .end((err) => {
@@ -70,7 +59,7 @@ describe('GET /breeds/:breedId', function () {
 
             .expect((res) => {
                 let breedObject = res.body; 
-                breedObject.should.have.property('breedId', 1);
+                breedObject.should.have.property('breedId', 1);    
                 breedObject.should.have.property('name', 'tabby');
                 breedObject.should.have.property('description');
             })
@@ -83,10 +72,10 @@ describe('GET /breeds/:breedId', function () {
 
     it('respond with 404 not found - invalid breed id', function (done) {
         request(appTest)
-            .get('/breeds/9')
+            .get('/breeds/10')
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, "id '9' not found in database")
+            .expect(404, "id '10' not found in database")
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -97,18 +86,18 @@ describe('GET /breeds/:breedId', function () {
 // variables for use in POST & PUT tests:
 
 let validObj = {
-    name: "norwegian mountain cat", 
-    description: "Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage."
+    "name": "norwegian mountain cat", 
+    "description": "Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage."
 }
 
 let invalidObj1 = {
-    name: "norwegian mountain cat", 
-    location: "Himalayan mountains",
+    "name": "norwegian mountain cat", 
+    "location": "Himalayan mountains",
 }
 
 let invalidObj2 = {
-    name: "norwegian mountain cat",
-    description: 100
+    "name": "norwegian mountain cat",
+    "description": 100
 }
 
 let emptyObj = {
@@ -118,13 +107,13 @@ describe('PUT /breeds/:breedId', function () {
 
     it('respond with updated json object', function (done) {
         request(appTest)
-            .put('/breeds/1')
+            .put('/breeds/9')
             .send(validObj)
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect((res) => {
                 let breedObject = res.body;
-                breedObject.should.have.property('breedId', 1);
+                breedObject.should.have.property('breedId', 9);
                 breedObject.should.have.property('name', 'norwegian mountain cat');
                 breedObject.should.have.property('description', 'Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
             })
@@ -137,11 +126,11 @@ describe('PUT /breeds/:breedId', function () {
 
     it('respond with 404 not found - invalid id', function (done) {
         request(appTest)
-            .put('/breeds/9')
+            .put('/breeds/10')
             .send(validObj)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
-            .expect(404, "id '9' not found in database")
+            .expect(404, "id '10' not found in database")
             .end((err) => {
                 if (err) return done(err); 
                 done(); 
@@ -150,7 +139,7 @@ describe('PUT /breeds/:breedId', function () {
 
     it('respond with 400 BAD REQUEST - invalid property key', function (done) {
         request(appTest)
-            .put('/breeds/1')
+            .put('/breeds/9')
             .send(invalidObj1)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
@@ -163,7 +152,7 @@ describe('PUT /breeds/:breedId', function () {
 
     it('respond with 400 BAD REQUEST - invalid property value', function (done) {
         request(appTest)
-            .put('/breeds/1')
+            .put('/breeds/9')
             .send(invalidObj2)
             .set('Accept', "text/html; charset=utf-8")
             .expect('Content-Type', "text/html; charset=utf-8")
@@ -176,9 +165,9 @@ describe('PUT /breeds/:breedId', function () {
 
     it('respond with 400 BAD REQUEST - invalid object', function (done) {
         request(appTest)
-            .put('/breeds/1')
+            .put('/breeds/9')
             .send(emptyObj)
-            .set('Accept', "text/html; charset=utf-8") // what is the diff between .set and .expect ? 
+            .set('Accept', "text/html; charset=utf-8") 
             .expect('Content-Type', "text/html; charset=utf-8")
             .expect(400, 'Error: Request data is not a valid object. ')
             .end((err) => {
@@ -188,18 +177,18 @@ describe('PUT /breeds/:breedId', function () {
     });
 })
 
-describe('POST /breeds/', function () {
-    it('responds with 201 CREATED, returns newly-created breed record with newly-assigned id 3', function (done) {
+describe('POST /breeds', function () {
+    it('responds with 201 CREATED, returns newly-created breed record with newly-assigned id 4', function (done) {
         request(appTest)
-            .post('/breeds/')
+            .post('/breeds')
             .send(validObj)
             .set('Accept', 'application/json')
-            .expect(200)
+            .expect(201)
             .expect((res) => {
                 let newBreed = res.body;
-                newBreed.breedId.should.equal(3);
-                newBreed.name.should.equal('norwegian mountain cat');
-                newBreed.description.should.equal('Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
+                newBreed.should.have.property('breedId', 4);  
+                newBreed.should.have.property('name', 'norwegian mountain cat');
+                newBreed.should.have.property('description', 'Mountain-dwelling fairy cat with an ability to climb sheer rock faces that other cats cannot manage.');
             })
             .end((err) => {
                 if (err) return done(err); 
@@ -211,7 +200,7 @@ describe('POST /breeds/', function () {
 describe('DEL /breeds/:id', function () {
     it('responds with 204 NO CONTENT', function (done) {
         request(appTest)
-            .delete('/breeds/1')
+            .delete('/breeds/4')
             .expect(204)
             .end((err) => {
                 if (err) return done(err); 
