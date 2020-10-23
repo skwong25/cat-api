@@ -89,7 +89,6 @@ curl --location --request PUT 'localhost:4001/cats/VozvVfwm6' \
 
 // DEL request with id parameter
 curl --location --request DELETE 'localhost:4001/cats/VozvVfwm6'
-
 // No content returned in response to DELETE request 
 ```
 
@@ -102,7 +101,6 @@ This project follows standard JS codestyle and *contributions should be validate
 - [ExpressJS](https://expressjs.com/) 
 - [Postman API development tool](https://www.postman.com/)
 - [Jest testing framework](https://jestjs.io/), [Mocha testing framework](https://mochajs.org/) & [Supertest Testing Library](https://www.npmjs.com/package/supertest)
-- This project was bootstrapped with ???
 
 ## Features
 
@@ -174,9 +172,6 @@ An invalid id or object will generate a 400 BAD REQUEST error.
 The cat & breed repository classes are pre-populated with properties containing cat & breeds objects, respectively. 
 Each class contains getter and setter methods to retrieve and update data as a complete set. 
 The subsequent methods employ the getter and setter methods, manipulating data further depending on the request.
-
-```javascript
-```
 
 ## Cat Repository ##
 
@@ -294,7 +289,10 @@ app.use(express.json());
 To run all tests, run `npm test` in Terminal. If all tests pass, you will see the screens below:
 
 ![tests](./screenshots/testscreenshot1.png)
-Format: ![screenshot1](url)
+
+![terminal](./screenshots/testscreenshot2.png)
+
+![pass message](./screenshots/testscreenshot3.png)
 
 <img src="./screenshots/testscreenshot1.png" width="450" alt="screenshot1">
 
