@@ -294,12 +294,6 @@ To run all tests, run `npm test` in Terminal. If all tests pass, you will see th
 
 ![pass message](./screenshots/testscreenshot3.png)
 
-<img src="./screenshots/testscreenshot1.png" width="450" alt="screenshot1">
-
-<img src="./screenshots/testsScreenshot2.png" width="450" alt="screenshot2">
-
-<img src="./screenshots/testsScreenshot3.png" width="450" alt="screenshot3">
-
 ## Unit Tests ##
     
 The validation function module is tested using unit tests, run on a jest framework. Example of a typical test case:
