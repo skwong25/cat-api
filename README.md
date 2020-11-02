@@ -1,9 +1,9 @@
 
-# Cat API #
+# Cat API v2.0 #
 
-# A REST API using ExpressJS
+# A REST API using Express JS & SQLite database
 
-A data repository to manage information about cats and pedigree breeds via the HTTP request-response cycle.
+A data repository to manage information about cats and pedigree breeds via the HTTP request-response cycle. Where v1.0 used an in-store memory store, v2.0 is updated to implement a SQLite database to allow records to persist upon process termination. 
 
 ## Getting Started 
 
@@ -20,12 +20,15 @@ It provided the opportunity to use the [mocha](https://mochajs.org/) framework, 
 
 It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.   
 
+It increased familiarity with the processes of managing data formats, for example, parsing JSON objects, curl and url encoded data. 
+
 ## How To Use 
 
 1.  Enter 'npm start' in Terminal. The tab will now read 'node'
 
 ```javascript
 the server is listening for catcalls on port 4001
+Connected to sqlite database
 ```
 2. Open new tab in Terminal. This tab reads 'bash'. 
 3. Enter a curl command request, including parameters / request body as required. 
@@ -106,35 +109,33 @@ This project follows standard JS codestyle and *contributions should be validate
 
 The application consists of two repository classes - Cat and Breed object classes, respectively. 
 In addition to this, there are two 'database querying' Express Routers to handle Cat and Breed routes, respectively. 
-A seperate module consolidates simple functions for use across classes. All modules are then imported into the main server file.  
+A seperate module consolidates simple functions for use across classes. All modules are imported into the main server file. All classes are instantiated in the main server file. 
 
 The API codebase is structured using repository pattern, minimising code repetition and upholding separation of concerns. 
-A consistence interface rationalises expectations for input/outputs for middleware and JS functions.  
+A consistent interface rationalises expectations for input/outputs for middleware and JS functions.  
 These elements support persistence ignorance, easing future implementation of a third party database. 
 
-The application includes a series of unit and integration tests, strengthened by the process of Test Driven Development.
+The application includes a series of unit and integration tests, strengthened by the process of Test Driven Development. All endpoints are covered by test cases. 
 Use of **Continuous Integration** allows for automated testing. 
-
-It increased familiarity with the processes of managing data formats, for example, parsing JSON objects, curl and url encoded data. 
 
 ## Code Walkthrough 
 
 ### Server ###
 
-The app.js server file consists of a function, which when called instantiates an express application, then mounts helper functions and Router instances.
-Helper functions consist of bodyparsing and HTTP request logger middleware.
+The app.js main server file imports & instantiates all classes, including starting up the express server and SQLite database. It mounts Routers to specified paths.
+
+Helper functions imported into app.js as a module, consist of bodyparsing and HTTP request logger middleware.
 It contains final error-handling middleware function to send error responses. 
 Finally, it sets the server up at specified port 4001 listening for requests.
-
-The app function is called in buildServer.js, passing in an id generator - shortid helper node module. 
-Seperating this step out allows a different id generator parameter to be passed in during testing. 
-
 
 ### Routers ###
 
 The cat & breed routers are subsets of routes to handle GET, PUT, POST, DEL requests on (/cats) and (/breeds) paths, respectively. 
 The router files only contain middleware functions; all other functions are imported in. This eases monitoring of the middleware stack control flow.
-Routes invoke corresponding methods of the cat & breed class repositories which retrieve/update information directly from the database.  
+
+Routes invoke corresponding methods of the cat & breed class repositories which call methods on the Data Access Object which add/retrieve/modify the database. 
+
+retrieve/update information directly from the database.  
 A successful route request returns object data as requested/updated/newly-created. An unsuccessful request returns a 404 NOT FOUND error. 
 Both routers contain middleware functions to verify passed id and object parameters, explained below. 
 Router instances are mounted in the main server file. 
@@ -169,24 +170,9 @@ An invalid id or object will generate a 400 BAD REQUEST error.
 
 ### Repository classes ###
 
-The cat & breed repository classes are pre-populated with properties containing cat & breeds objects, respectively. 
-Each class contains getter and setter methods to retrieve and update data as a complete set. 
-The subsequent methods employ the getter and setter methods, manipulating data further depending on the request.
+Upon instantiation, the cat & breed repository class constructors are passed the Data Access Object (DAO) via dependancy injection. Each class instance calls methods of the DAO to methods to retrieve and update data.
 
 ## Cat Repository ##
-
-The cat repository takes an idGenerator argumen which generates a unique id for each cat object in the database upon class instantion. 
-Dependancy injection in the constructor allows us to pass in a mock id generator for testing. 
-
-```javascript
-class CatRepository {
-    constructor(idGenerator) { 
-        this.generateId = idGenerator; 
-        ...
-    }
-    ...
-}
-```
 
 getIndexById() receives a cat id as argument. It searches the database and returns the index of the record with matching id. If none found, returns null. This function is called locally to check whether the database contains a record with a given cat id.  
 
@@ -216,7 +202,8 @@ updateCatById() receives a cat object and a cat id. It updates only properties w
 
 deleteCatById() receives a cat id. It deletes the matching cat record in the database. If no matching record found, returns null. 
 
-addCat() receives a cat object to be added to the database. It attaches a new unique id to the object, and then updates the database via setter method. Returns the newly-added cat object.
+addCat() receives a cat object to be added to the database. 
+It generates a new id via a idGenerator helper function upon a POST record route. It attaches this new unique id to the object, and then updates the database. Returns the newly-added cat object.
 
 ## Validation Functions ##
 
@@ -286,7 +273,11 @@ app.use(express.json());
 
 ## How To Test
 
-To run all tests, run `npm test` in Terminal. If all tests pass, you will see the screens below:
+- To run tests for cat routes, run `npm run cats`.
+- To run tests for breed routes, run `npm run breeds`.
+- To run all tests, run `npm test`.
+
+The above scripts set out in the package.json file. If all tests pass, you will see the screens below:
 
 ![tests](./screenshots/testscreenshot1.png)
 
@@ -311,7 +302,6 @@ To run the unit test suite, run `npm run unit` in Terminal.
 ## Integration Tests ##
 
 Class repositories and routers are tested using integration tests. These test the request-response cycle, run on a mocha framework.
-A mock id generator is passed into the constructor for enable testing assertions for requests by id: 
 
 ```javascript
 const generateTestId = {
