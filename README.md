@@ -277,7 +277,7 @@ app.use(express.json());
 - To run tests for breed routes, run `npm run breeds`.
 - To run all tests, run `npm test`.
 
-The above scripts set out in the package.json file. If all tests pass, you will see the screens below:
+The above scripts set out in the package.json file. If all tests pass, you will see the screenshots below:
 
 ![tests](./screenshots/testscreenshot1.png)
 

@@ -4,7 +4,7 @@
   "description": "API to process HTTP requests to access information on local cats",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js",
+    "start": "node  -n Suz -c blue src/app.js",
     "test": "npm run unit && npm run integration",
     "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
     "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit",
