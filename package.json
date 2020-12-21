@@ -4,7 +4,7 @@
   "description": "API to process HTTP requests to access information on local cats",
   "main": "index.js",
   "scripts": {
-    "start": "node  -n Suz -c blue src/app.js",
+    "start": "node src/app.js",
     "test": "npm run unit && npm run integration",
     "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
     "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit",
@@ -12,6 +12,10 @@
     "cats": "mocha 'test/catRoutes.test.js' --exit",
     "cucumber": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps",
     "cucumberPublish": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --publish"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "src"
   },
   "repository": {
     "type": "git",
@@ -29,7 +33,9 @@
     "express": "^4.17.1",
     "jest": "^26.4.2",
     "mocha": "^8.1.1",
+    "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
     "shortid": "^2.2.15",
     "should": "^13.2.3",
     "sqlite3": "^5.0.0"

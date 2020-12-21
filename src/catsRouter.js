@@ -35,12 +35,12 @@ class CatsRouter {
         // As JSON bodyparses attaches parsed object to req.body, so no need to check object type: typeof object === "object" 
         const object = req.body; 
         const keys = Object.keys(object);
+        console.log("OBJECT: " + JSON.stringify(object)); // TODO: Delete post-debug 
         const validKeys = ["name", "ageInYears", "favouriteToy", "description"];
         let arrayOfFunctions = [this.validate.checkObjFormat, this.validate.checkObjKeys, this.validate.checkObjValues];
 
         arrayOfFunctions.forEach((funct) => { 
             let message = funct(keys, object, validKeys);
-
             if (message[0] === "E") {
                 const err = this.validate.generateErr400(message);
                 return next(err);
@@ -87,7 +87,7 @@ class CatsRouter {
         this.catsRouter.post('/', this.checkObject, async (req, res, next) => {   
             try {
                 const catWithId = await this.catRepository.addCat(req.object); 
-                console.log('router: ready to return create record ' + catWithId);
+                console.log('router: ready to return create record ' + JSON.stringify(catWithId));
                 res.status(201).send(catWithId);  
             } catch (err) {
                 next(err); 
