@@ -11,6 +11,9 @@
     "breeds": "mocha 'test/breedRoutes.test.js' --exit",
     "cats": "mocha 'test/catRoutes.test.js' --exit",
     "cucumber": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps",
+    "cucumberDEL": "cucumber-js ./cucumberTests/features/deleteData.feature -r ./cucumberTests/steps",
+    "cucumberDelete": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags @delete",
+    "cucumberWIP": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags @wip",
     "cucumberPublish": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --publish"
   },
   "_moduleAliases": {

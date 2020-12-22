@@ -1,5 +1,5 @@
 
-# feature/addNewRecord.feature
+# feature/addData.feature
 
 # feature description follows the 'user story style'
 Feature: Add new record to the database  
