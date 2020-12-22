@@ -30,51 +30,38 @@ Given('I run the node application', function () {
 Given('I count the number of records in the database', async function () {
     // makes GET request and counts number of objects returned 
     const endpoint = 'http://localhost:4001/cats/';
-    try {
-        const response = await fetch(endpoint)
-            if (response.ok) {
-                jsonResponse = await response.json();
-                // json() method takes a Response stream body test and parses it to JSON(resolved result), returns a Promise 
-                if (existingRecords === undefined) {
-                    existingRecords = jsonResponse.cats.length;
-                } else {
-                    newNumberOfRecords = jsonResponse.cats.length; 
-                }
-            } else {
-                throw new Error('GET request failed');
-            }
-    } catch (error) {
-        console.log(error);
+    const response = await fetch(endpoint)
+    if (response.ok) {
+        jsonResponse = await response.json();
+        // json() method takes a Response stream body test and parses it to JSON(resolved result), returns a Promise 
+        if (existingRecords === undefined) {
+            existingRecords = jsonResponse.cats.length;
+        } else {
+            newNumberOfRecords = jsonResponse.cats.length; 
+        }
+    } else {
+        throw new Error('GET request failed');
     }
-
 })
 
 When('I make a GET request with {word}', async function (path) {
     const endpoint = 'http://localhost:4001/cats/' + path;
-    try {
-        const response = await fetch(endpoint)
-            if (response.ok) {
-                jsonResponse = await response.json();
-                // json() method takes a Response stream body test and parses it to JSON(resolved result), returns a Promise 
-            } else {
-                throw new Error('Test: GET request failed');
-            }
-    } catch (error) {
-        console.log(error);
+    const response = await fetch(endpoint)
+    if (response.ok) {
+        jsonResponse = await response.json();
+        // json() method takes a Response stream body test and parses it to JSON(resolved result), returns a Promise 
+    } else {
+        throw new Error('Test: GET request failed');
     }
 });
 
 When('I make a GET request for the same record', async function () {
     const endpoint = 'http://localhost:4001/cats/' + lastId;
-    try {
-        responseG = await fetch(endpoint)
-            if (responseG) {
-                return responseG; 
-            } else {
-                throw new Error('Test: GET request failed');
-            }
-    } catch (error) {
-        console.log(error);
+    responseG = await fetch(endpoint)
+    if (responseG) {
+        return responseG; 
+    } else {
+        throw new Error('Test: GET request failed');
     }
 });
 
@@ -84,61 +71,44 @@ When('I make a POST request', async function () {
         description: 'Siamese' 
     };
     const endpoint = 'http://localhost:4001/cats/';
-    try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': 56
-                },
-            body: JSON.stringify(data)
-        });
-        if (response.ok) {
-            jsonResponse = await response.json(); 
-            return jsonResponse; 
-        } else {
-            throw new Error('Test: POST Request failed');
-        } 
-    } catch (error) {
-        console.log(error);
-        // FIXME: when there is an error why doesn't this stop the execution of steps? 
-    }
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': 56
+            },
+        body: JSON.stringify(data)
+    });
+    if (response.ok) {
+        jsonResponse = await response.json(); 
+        return jsonResponse; 
+    } else {
+        throw new Error('Test: POST Request failed');
+    } 
 })
-// note that async await...is coupled with a try...catch block (no need for .then chain)
-// a fetch request chained with .then statements and success and failure handlers does not need a try...catch block 
-
 
 When('I make a DEL request', async function () {
     // GET request to access id of the last record 
     let endpoint = 'http://localhost:4001/cats/'; 
-    try {
-        const response = await fetch(endpoint)
-            if (response.ok) {
-                jsonResponse = await response.json(); 
-                console.log("Within DEL request, no. of records" + jsonResponse.cats.length);
-                lastId = jsonResponse.cats.pop().id;
-                // arr.pop() returns last element, note it mutates jsonResponse 
-            } else {
-                throw new Error('Test: GET request failed');
-            }
-    } catch (error) {
-        console.log(error);
+    const response = await fetch(endpoint)
+    if (response.ok) {
+        jsonResponse = await response.json(); 
+        console.log("Within DEL request, no. of records" + jsonResponse.cats.length);
+        lastId = jsonResponse.cats.pop().id;
+        // arr.pop() returns last element, note it mutates jsonResponse 
+    } else {
+        throw new Error('Test: GET request failed');
     }
     // DEL request 
     endpoint = 'http://localhost:4001/cats/' + lastId;  
-    try {
-        const response = await fetch(endpoint, {
+    const response = await fetch(endpoint, {
             method: 'DELETE'
         });
-        if (!response.ok) {
-            throw new Error('Test: DEL Request failed');
-        } 
-    } catch (error) {
-        console.log(error);
-    }
+    if (!response.ok) {
+        throw new Error('Test: DEL Request failed');
+    } 
 })
-
 
 Then('I get cat information with correct {string}', function (name) {
     let returnedName = jsonResponse.name;
@@ -150,19 +120,19 @@ Then('the cat object is returned with an id attached', function () {
     assert.ok(newId);
 })
 
-Then('the number of records in the database has increased', function () {
+Then('the number of records in the database increases by {int}', function (number) {
     assert.ok(existingRecords);
     assert.ok(newNumberOfRecords);
-    assert.strictEqual(existingRecords+1, newNumberOfRecords);
+    assert.strictEqual(existingRecords + number, newNumberOfRecords);
 })
 
-Then('the number of records in the database has decreased', function () {
+Then('the number of records in the database decreases by {int}', function (number) {
     assert.ok(existingRecords);
     assert.ok(newNumberOfRecords);
-    assert.strictEqual(existingRecords-1, newNumberOfRecords);
+    assert.strictEqual(existingRecords - number, newNumberOfRecords);
 })
 
-Then('a 404 error is returned', function () {
-    assert.strictEqual(responseG.status, 404); 
+Then('it returns a response with HTTP status code of {int}', function (code) {
+    assert.strictEqual(responseG.status, code); 
 })
 

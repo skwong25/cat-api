@@ -13,7 +13,7 @@ Scenario: The application creates a new database record
     And I count the number of records in the database
     When I make a POST request 
     And I count the number of records in the database 
-    Then the number of records in the database increases 
+    Then the number of records in the database increases by 1
 
 Scenario: The application assigns an ID to a new database record
     Given I run the node application
