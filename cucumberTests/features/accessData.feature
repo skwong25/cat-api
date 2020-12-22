@@ -3,9 +3,9 @@
 # feature description follows the 'user story style'
 Feature: Access data from the database  
 
-    As a user of the API
-    I want to be able to make a GET request
-    So that I can access information stored in the database
+    As a cat fanatic
+    I want to access information stored in the database
+    So that I can read details of data on a specific cat
 
 Scenario: Retrieve cat detail information for GET by ID requests
     Given I run the node application

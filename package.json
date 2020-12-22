@@ -10,9 +10,10 @@
     "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit",
     "breeds": "mocha 'test/breedRoutes.test.js' --exit",
     "cats": "mocha 'test/catRoutes.test.js' --exit",
-    "cucumber": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps",
+    "cucumber": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags ~@wip",
     "cucumberDEL": "cucumber-js ./cucumberTests/features/deleteData.feature -r ./cucumberTests/steps",
-    "cucumberDelete": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags @delete",
+    "cucumberPOST": "cucumber-js ./cucumberTests/features/addData.feature -r ./cucumberTests/steps",
+    "cucumberGET": "cucumber-js ./cucumberTests/features/accessData.feature -r ./cucumberTests/steps",
     "cucumberWIP": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags @wip",
     "cucumberPublish": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --publish"
   },

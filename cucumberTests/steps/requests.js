@@ -78,7 +78,7 @@ When('I make a GET request for the same record', async function () {
     }
 });
 
-When('I make a POST request with a cat object', async function () {
+When('I make a POST request', async function () {
     const data = {
         name: 'Delilah',
         description: 'Siamese' 
