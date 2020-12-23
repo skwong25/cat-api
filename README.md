@@ -18,9 +18,16 @@ See section [Tests](#how-to-test) for how to run test suites.
 To create an API with full CRUD functionality to put knowledge of [Javascript](https://www.javascript.com/) and the [ExpressJS](https://expressjs.com/) framework into practice.  
 It provided the opportunity to use the [mocha](https://mochajs.org/) framework, [jest](https://jestjs.io/) and [supertest](https://www.npmjs.com/package/supertest) library for writing unit and integration tests. 
 
+It provided also the opportunity to use [Cucumber](https://cucumber.io/docs/cucumber/) testing framework, writing tests in [Gherkin](https://cucumber.io/docs/gherkin/reference/) syntax.  
+
 It helped me to develop my [github](https://github.com/) workflow for better management of *branches* and *pull requests*, to enable separation of concerns for easier review and working.   
 
-It increased familiarity with the processes of managing data formats, for example, parsing JSON objects, curl and url encoded data. 
+It increased familiarity with the processes of managing data formats, for example, parsing JSON objects, curl, url encoded data and defining headers. 
+
+This allowed the chance to organise the task and manage workflow using [Trello](https://trello.com/en) Kanban. 
+
+
+![cucumber kanban](./screenshots/kanbanCucumber.png)
 
 ## How To Use 
 
@@ -102,8 +109,11 @@ This project follows standard JS codestyle and *contributions should be validate
 ## Tech/Framework Used
 
 - [ExpressJS](https://expressjs.com/) 
+- [SQLite library / SQL database](https://www.sqlite.org/index.html?) 
 - [Postman API development tool](https://www.postman.com/)
 - [Jest testing framework](https://jestjs.io/), [Mocha testing framework](https://mochajs.org/) & [Supertest Testing Library](https://www.npmjs.com/package/supertest)
+- [Cucumber testing framework](https://cucumber.io/docs/cucumber/) & [Gherkin syntax](https://cucumber.io/docs/gherkin/reference/) 
+- [Trello Kanban](https://trello.com/en) 
 
 ## Features
 
@@ -275,6 +285,9 @@ app.use(express.json());
 
 - To run tests for cat routes, run `npm run cats`.
 - To run tests for breed routes, run `npm run breeds`.
+
+- To run all acceptance tests, run `npm run cucumber`.  
+
 - To run all tests, run `npm test`.
 
 The above scripts set out in the package.json file. If all tests pass, you will see the screenshots below:
@@ -284,6 +297,8 @@ The above scripts set out in the package.json file. If all tests pass, you will 
 ![terminal](./screenshots/testscreenshot2.png)
 
 ![pass message](./screenshots/testscreenshot3.png)
+
+![cucumber pass](./screenshots/testscreenshot4.png)
 
 ## Unit Tests ##
     
@@ -331,6 +346,67 @@ describe('GET /cats/:id', function () {
 ```
 
 To run integration test suites (for both cat and breed repositories), run `npm run integration` in Terminal. 
+
+
+## Acceptance Tests ##
+
+Acceptance tests validate end-to-end behaviour and features available to the user, expressed as usage scenarios. 
+
+- To run tests for accessing data, run `npm run cucumberGET`
+- To run tests for deleting data, run `npm run cucumberDEL`
+- To run tests for adding data, run `npm run cucumberPOST`
+- To run test and generate test report, run `npm run cucumberPublish`
+
+Example of a typical Scenario (test case):
+
+```gherkin
+Feature: Access data from the database  
+
+    As a cat fanatic
+    I want to access information stored in the database
+    So that I can read details of data on a specific cat
+
+Scenario: Retrieve cat detail information for GET by ID requests
+    Given I run the node application
+    When I make a GET request with <id> 
+    Then I get cat information with correct <name> 
+
+Examples:
+    |    id      |     name            |   
+    | jAWcE8ooF1 |   "Pancake"         |
+    | uKVZvMxhLt |   "Frank"           |
+    | gWyGbxF934 |  "Madame Floof"     |
+
+```
+
+Corresponding step definitions:
+
+```javascript
+Given('I run the node application', function () {
+    const app = require('@src/app.js'); 
+});
+
+
+When('I make a GET request with {word}', async function (path) {
+    const endpoint = 'http://localhost:4001/cats/' + path;
+    const response = await fetch(endpoint)
+    if (response.ok) {
+        jsonResponse = await response.json();
+        // json() method takes a Response stream body test and parses it to JSON(resolved result), returns a Promise 
+    } else {
+        throw new Error('Test: GET request failed');
+    }
+});
+
+
+Then('I get cat information with correct {string}', function (name) {
+    let returnedName = jsonResponse.name;
+    assert.strictEqual(returnedName, name);
+});
+```
+
+
+
 
 ## Credits
 

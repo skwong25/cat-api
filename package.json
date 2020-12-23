@@ -4,12 +4,22 @@
   "description": "API to process HTTP requests to access information on local cats",
   "main": "index.js",
   "scripts": {
-    "start": "node  -n Suz -c blue src/app.js",
-    "test": "npm run unit && npm run integration",
+    "start": "node src/app.js",
+    "test": "npm run unit && npm run integration && npm run cucumber",
     "unit": "jest 'test/validationFunctions.test.js' --detectOpenHandles --forceExit",
     "integration": "mocha 'test/breedRoutes.test.js' --exit && mocha 'test/catRoutes.test.js' --exit",
     "breeds": "mocha 'test/breedRoutes.test.js' --exit",
-    "cats": "mocha 'test/catRoutes.test.js' --exit"
+    "cats": "mocha 'test/catRoutes.test.js' --exit",
+    "cucumber": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps",
+    "cucumberDEL": "cucumber-js ./cucumberTests/features/deleteData.feature -r ./cucumberTests/steps",
+    "cucumberPOST": "cucumber-js ./cucumberTests/features/addData.feature -r ./cucumberTests/steps",
+    "cucumberGET": "cucumber-js ./cucumberTests/features/accessData.feature -r ./cucumberTests/steps",
+    "cucumberWIP": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --tags @wip",
+    "cucumberPublish": "cucumber-js ./cucumberTests/features -r ./cucumberTests/steps --publish"
+  },
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "src"
   },
   "repository": {
     "type": "git",
@@ -22,11 +32,14 @@
   },
   "homepage": "https://github.com/skwong25/cat-api#readme",
   "dependencies": {
+    "@cucumber/cucumber": "^7.0.0-rc.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "jest": "^26.4.2",
     "mocha": "^8.1.1",
+    "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.1",
     "shortid": "^2.2.15",
     "should": "^13.2.3",
     "sqlite3": "^5.0.0"

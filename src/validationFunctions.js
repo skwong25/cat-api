@@ -38,6 +38,10 @@ function checkObjFormat(keys) {
 
 // checks for valid keys 
 function checkObjKeys(keys, object, validKeys) {
+    // the second argument to remain 'object' - refer to checkObject function in catsRouter.js 
+    // TODO: an empty array will pass this check - false positive
+    // actually the program should terminate as soon as we encounter a 
+    // maybe we can use a uncaught error handler instead of a try...catch block
     let invalidKeys = keys.filter((key) => {  
         return !validKeys.includes(key);
     });
@@ -48,6 +52,7 @@ function checkObjKeys(keys, object, validKeys) {
 // checks for valid property values  
 function checkObjValues(keys, object) {  
     let isError = [];
+    // FIXME: an empty array will pass this check - false positive
     keys.forEach((key) => {
         let value = object[key]; 
         let invalidParam = (key === "ageInYears") ? isInvalidNum(value) : isInvalidString(value);
