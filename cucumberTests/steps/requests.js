@@ -91,7 +91,7 @@ When('I make a POST request', async function () {
 When('I make a DEL request', async function () {
     // GET request to access id of the last record 
     let endpoint = 'http://localhost:4001/cats/'; 
-    const response = await fetch(endpoint)
+    let response = await fetch(endpoint)
     if (response.ok) {
         jsonResponse = await response.json(); 
         console.log("Within DEL request, no. of records" + jsonResponse.cats.length);
@@ -102,7 +102,7 @@ When('I make a DEL request', async function () {
     }
     // DEL request 
     endpoint = 'http://localhost:4001/cats/' + lastId;  
-    const response = await fetch(endpoint, {
+    response = await fetch(endpoint, {
             method: 'DELETE'
         });
     if (!response.ok) {

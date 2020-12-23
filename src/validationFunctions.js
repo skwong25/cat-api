@@ -31,21 +31,18 @@ function generateErr404(id) {
 
 // checks for a populated object 
 function checkObjFormat(keys) { 
-    console.log("ARE WE EVEN GETTING THIS FAR?"); // TODO: Delete post-debug 
     let message = (keys.length !== 0) ? 
         'Check successful - request data verified as valid object' : 'Error: Request data is not a valid object. ' 
-    console.log("MESSAGE: " +  message); // TODO: Delete post-debug 
     return message; 
 } 
 
 // checks for valid keys 
 function checkObjKeys(keys, object, validKeys) {
     // the second argument to remain 'object' - refer to checkObject function in catsRouter.js 
-    console.log("CHECK validKeys: " +  JSON.stringify(validKeys));
-    console.log("CHECK keys: " +  keys)
-    // FIXME: an empty array will pass this check - false positive
+    // TODO: an empty array will pass this check - false positive
+    // actually the program should terminate as soon as we encounter a 
+    // maybe we can use a uncaught error handler instead of a try...catch block
     let invalidKeys = keys.filter((key) => {  
-        console.log("CHECK key: " +  key)
         return !validKeys.includes(key);
     });
     let message = (invalidKeys.length === 0) ? 'Check successful - object keys valid' : `Error: Property '${invalidKeys[0]}' is invalid` ;
